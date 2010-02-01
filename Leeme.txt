@@ -1,0 +1,76 @@
+********************************
+ DuinOS v0.1 Alpha
+********************************
+
+Copyright (C) 2009 Multiplo
+http://multiplo.org
+http://robotgroup.com.ar
+Creaddo por Julián U. da Silva Gillig.
+
+Basado en el kernel FreeRTOS v5.4.2 (www.freertos.org). Ver por favor la sección Licencia más abajo.
+Ésta es nuestra única distribución de DuinOS, la cual incluye el código fuente completo. La última versión está
+siempre disponible en http://robotgroup.com.ar
+
+********************************
+ Licencia
+********************************
+El kernel DuinOS (cores\arduino.DuinOS) se distribuye bajo la misma licencia que el sistema operativo FreeRTOS 
+(www.freertos.org). Ver por favor el archivo FreeRTOS.license.txt, el cual se incluye con esta distribución.
+
+Se han utilizado también aquí archivos de la migración de Micropendous (www.micropendous.org) del sistema operativo
+FreeRTOS a AVR. Al ser dichos archivos modificaciones de archivos originales de la distribución de FreeRTOS, 
+entendemos que están bajo la licencia GPL modificada de FreeRTOS. Agradecemos a Opendous Inc por su aporte a la
+comunidad de usuarios de software libre. Si hubiere otros archivos derivados o provenientes del proyecto 
+Micropendous, éstos se encuentran bajo la siguiente licencia:
+
+Copyright Under the Creative Commons Attribution License
+http://creativecommons.org/licenses/by/3.0/
+By Opendous Inc.
+www.Micropendous.org
+October 04, 2009
+
+Por favor visita www.micropendous.org si tienes cualquier duda.
+
+NOTA: Nosotros creemos en la paz, por lo que no nos gustaría ver nuestro trabajo utilizado en proyectos militares de
+cualquier clase. Pero, debido a que debemos mantener este proyecto bajo la licencia GPL modificada de FreeRTOS, esto
+es sólo una recomendación, y una expresión de nuestros deseos.
+
+
+********************************
+ Instalacrión de DuinOS
+********************************
+
+0. Cierra el IDE Arduino (todas las instancias).
+1. Copia la carpeta arduino.DuinOS a tu carpeta \hardware\cores.
+2. Renombra el archivo \hardware\boards.txt que tienes actualmente.
+3. Copia el archivo boards.txt incluido en esta distribución a tu actual carpeta \hardware.
+4. Renombra el archivo \lib\keywords.txt que tienes actualmente.
+5. Copia el archivo keywords.txt incluido en esta distribución a tu actual carpeta \lib.
+6. Ejecuta el IDE Arduino.
+7. Selecciona alguno de los Boards que soportan DuinOS del menú Tools->Board (por ejemplo 
+   "Arduino Duemilanove or Nano w/ ATmega328 + DuinOS".
+8. Ahora, ya puedes compilar cualquier proyecto normal, aunque nosotros te sugerimos probar el ejemplo que se distribuye 
+   con DuinOS: \examples\MoreComplexBlinking.
+
+   
+********************************
+  DECLINACIÓN DE
+  RESPONSABILIDADES
+********************************
+
+EL SOFTWARE O LOS CONTENIDOS QUE EVENTUALMENTE SE ENCUENTREN EN ÉL (SEAN ESTOS DE CUALQUIER CLASE) SON PROVISTOS POR LOS
+DUEÑOS DE LOS DERECHOS INTELECTUALES Y POR QUIENES CONTRIBUYERON A SU DESARROLLO "COMO SON", RENUNCIANDO ELLOS A 
+CUALQUIER TIPO DE GARANTÍA EXPLÍCITA O IMPLÍCITA, INCLUYENDO, AUNQUE NO LIMITÁNDOSE, A LAS GARANTÍAS IMPLÍCITAS DE 
+COMERCIALIZACIÓN Y DE ADAPTACIÓN A PROPÓSITOS PARTICULARES. BAJO NINGUNA CIRCUNSTANCIA SERÁN LOS DUEÑOS DE LOS DERECHOS 
+INTELECTUALES Y QUIENES CONTRIBUYERON AL DESARROLLO RESPONSABLES POR DAÑO ALGUNO, DIRECTO, INDIRECTO, INCIDENTAL, CASUAL,
+CAUSAL (INCLUYENDO PERO NO LIMITÁNDOSE A DAÑOS A LA VIDA Y/O A LA PROPIEDAD, PÉRDIDA DE DATOS, LUCRO CESANTE, 
+INTERRUPCIÓN DE NEGOCIOS), AUNQUE EL MISMO OCURRA BAJO CUALQUIER TEORÍA DE DERECHO, PRODUCIDO EN CUALQUIER FORMA DE USO 
+DE ESTE DESARROLLO O DESARROLLOS DE ÉL DERIVADOS, AÚN CUANDO SE AVISE O NO DE DICHO DAÑO O SU POSIBILIDAD.
+
+
+********************************
+ Historia / Registro de camgios
+********************************
+
+2009.11.02:
+	- Lanzamiento de la primera version (DuinOS v0.1 Alpha).
