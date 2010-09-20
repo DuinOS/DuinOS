@@ -1,0 +1,138 @@
+********************************
+ DuinOS v0.2 Alpha
+********************************
+
+Copyright (C) 2009 Multiplo
+http://multiplo.org
+http://robotgroup.com.ar
+Creaddo por Julián U. da Silva Gillig.
+
+Basado en el kernel FreeRTOS v5.4.2 (www.freertos.org). Ver por favor la sección Licencia más abajo.
+Ésta es nuestra única distribución de DuinOS, la cual incluye el código fuente completo. La última versión está
+siempre disponible en http://robotgroup.com.ar
+
+********************************
+ Licencia
+********************************
+El kernel DuinOS (cores\arduino.DuinOS) se distribuye bajo la misma licencia que el sistema operativo FreeRTOS 
+(www.freertos.org). Ver por favor el archivo FreeRTOS.license.txt, el cual se incluye con esta distribución.
+
+Se han utilizado también aquí archivos de la migración de Micropendous (www.micropendous.org) del sistema operativo
+FreeRTOS a AVR. Al ser dichos archivos modificaciones de archivos originales de la distribución de FreeRTOS, 
+entendemos que están bajo la licencia GPL modificada de FreeRTOS. Agradecemos a Opendous Inc por su aporte a la
+comunidad de usuarios de software libre. Si hubiere otros archivos derivados o provenientes del proyecto 
+Micropendous, éstos se encuentran bajo la siguiente licencia:
+
+Copyright Under the Creative Commons Attribution License
+http://creativecommons.org/licenses/by/3.0/
+By Opendous Inc.
+www.Micropendous.org
+October 04, 2009
+
+Por favor visita www.micropendous.org si tienes cualquier duda.
+
+NOTA: Nosotros creemos en la paz, por lo que no nos gustaría ver nuestro trabajo utilizado en proyectos militares de
+cualquier clase. Pero, debido a que debemos mantener este proyecto bajo la licencia GPL modificada de FreeRTOS, esto
+es sólo una recomendación, y una expresión de nuestros deseos.
+
+
+********************************
+ Instalación de DuinOS
+********************************
+
+0. Cierra el IDE Arduino (todas las instancias).
+1. Copia la carpeta arduino.DuinOS a tu carpeta \hardware\cores.
+2. Renombra el archivo \hardware\boards.txt que tienes actualmente.
+3. Copia el archivo boards.txt incluido en esta distribución a tu actual carpeta \hardware.
+4. Renombra el archivo \lib\keywords.txt que tienes actualmente.
+5. Copia el archivo keywords.txt incluido en esta distribución a tu actual carpeta \lib.
+6. Ejecuta el IDE Arduino.
+7. Selecciona alguno de los Boards que soportan DuinOS del menú Tools->Board (por ejemplo 
+   "Arduino Duemilanove or Nano w/ ATmega328 + DuinOS".
+8. Ahora, ya puedes compilar cualquier proyecto normal, aunque nosotros te sugerimos probar el ejemplo que se distribuye 
+   con DuinOS: \examples\MoreComplexBlinking.
+
+
+********************************
+ Desinstalación
+********************************
+
+0. Cierra el IDE Arduino (todas las instancias).
+1. Si has renombrado el archivo boards.txt orginal, borra el actual archivo boards.txt y renombra el anterior (para que se 
+   llame nuevamente boards.txt.
+2. Si has renombrado el archivo keywords.txt orginal, borra el actual archivo keywords.txt y renombra el anterior (para que se 
+   llame nuevamente keywords.txt.
+3. Borra la carpeta arduino.DuinOS de \cores.
+4. Ahora ya deberías poder reiniciar el IDE Arduino y continuar trabajando sin DuinOS.
+
+   
+********************************
+  DECLINACIÓN DE
+  RESPONSABILIDADES
+********************************
+
+EL SOFTWARE O LOS CONTENIDOS QUE EVENTUALMENTE SE ENCUENTREN EN ÉL (SEAN ESTOS DE CUALQUIER CLASE) SON PROVISTOS POR LOS
+DUEÑOS DE LOS DERECHOS INTELECTUALES Y POR QUIENES CONTRIBUYERON A SU DESARROLLO "COMO SON", RENUNCIANDO ELLOS A 
+CUALQUIER TIPO DE GARANTÍA EXPLÍCITA O IMPLÍCITA, INCLUYENDO, AUNQUE NO LIMITÁNDOSE, A LAS GARANTÍAS IMPLÍCITAS DE 
+COMERCIALIZACIÓN Y DE ADAPTACIÓN A PROPÓSITOS PARTICULARES. BAJO NINGUNA CIRCUNSTANCIA SERÁN LOS DUEÑOS DE LOS DERECHOS 
+INTELECTUALES Y QUIENES CONTRIBUYERON AL DESARROLLO RESPONSABLES POR DAÑO ALGUNO, DIRECTO, INDIRECTO, INCIDENTAL, CASUAL,
+CAUSAL (INCLUYENDO PERO NO LIMITÁNDOSE A DAÑOS A LA VIDA Y/O A LA PROPIEDAD, PÉRDIDA DE DATOS, LUCRO CESANTE, 
+INTERRUPCIÓN DE NEGOCIOS), AUNQUE EL MISMO OCURRA BAJO CUALQUIER TEORÍA DE DERECHO, PRODUCIDO EN CUALQUIER FORMA DE USO 
+DE ESTE DESARROLLO O DESARROLLOS DE ÉL DERIVADOS, AÚN CUANDO SE AVISE O NO DE DICHO DAÑO O SU POSIBILIDAD.
+
+
+********************************
+ Historia / Registro de cambios
+********************************
+
+DuinOS v0.1 Alpha (2009.11.02):
+	- Lanzamiento de la primera versión.
+	
+DuinOS v0.2 Alpha (2010.06.30, Michael Grigorev aka CHERTS <sleuthhound@gmail.com>):
+	- Arduino updated to version 0018
+	- FreeRTOS updated to version 6.0.5
+	- Add new example MoreComplexBlinkingAndSound (Blinks two LEDs and play sound)
+
+DuinOS v0.3 (2010.##.##):
+	- Ideas (por ahora):
+		- Cambios en los archivos del Core:
+			- FreeRTOS.h:
+				- Se habilitaron por defecto los semáforos tipo MUTEX.
+			- FreeRTOSConfig.h:
+				- Se llevó el configTOTAL_HEAP_SIZE	de 800 a 500 bytes para los CPUs m88, m88p, m168 y m168p
+				(bug reportado por "chumbud" en el foro en inglés de Arduino).
+	##			- Se cambió el stack de tareas inicial, dependiendo del procesador a utilizar:
+					- ATMega168: Se llevó de 85 bytes a ## bytes.
+					- ATMega328: Se llevó de 85 bytes a ## bytes.
+					- ATMega644: Se llevó de 85 bytes a ## bytes.
+					- ATMega1280: Se llevó de 85 bytes a ## bytes.
+					- ATMega1284: Se llevó de 85 bytes a ## bytes.
+			- DuinOS.h:
+				- Se agregaron tasks convencionales de FreeRTOS, sin el for(;;) de los taskLoops.
+				- Se eliminaron los taskLoops, cambiándolos simplemente por tasks. Por dos motivos principales:
+					- Debería hacer al sistema más parecido a FreeRTOS, y dar más control sobre la inicialización de cada tarea.
+					- Se detectó en el feedback de diferentes usuarios que hubo bastante confusión en el uso de los taskLoops.
+				- Consecuentemente, se eliminaron los siguientes elementos de la sintaxis:
+					- Macro declareTaskLoop.
+					- createTaskLoop.
+	##				- deleteTaskLoop.
+				- Y se agregaron los siguientes elementos:
+					- createTask, que trabaja también por nombre (de forma similar al createTaskLoop).
+					- Macro taskType para la declaración "forward" de tasks (sugerencia hecha "Chumbud" en el foro en inglés de Arduino).
+					- Se agregó la posibilidad de definir el tamaño del stack de los tasks, sin necesidad de recurrir a la API de FreeRTOS.
+	##				- deleteTask
+			- HardwareSerial.h / HardwareSerial.cpp:
+				- Se agregó la creación automática de la instancia Serial1 para los CPUs m644, m644p y m1284p.
+	##		- cpplib:
+	##			- new
+	##			- delete
+	##			- herencia virtual...
+		- Librerías:
+	##		- mprintf
+		- Documentación:
+			- Leeme.txt / Readme.txt:
+				- Se agregó la sección de "Desinstalación".
+	##		- Wiki (http://www.multiplo.org/duinos/wiki/):
+				- ##
+		- Ejemplos:
+			- Se agregó un ejemplo de semáforos tipo MUTEX.
