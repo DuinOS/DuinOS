@@ -95,6 +95,7 @@ DuinOS v0.2 Alpha (2010.06.30, Michael Grigorev aka CHERTS <sleuthhound@gmail.co
 
 DuinOS v0.3 (2010.##.##):
 	- Ideas (por ahora):
+		- Ver todo el foro de Arduino, por los posibles bugs pendientes reportados ahí.
 		- Cambios en los archivos del Core:
 			- FreeRTOS.h:
 				- Se habilitaron por defecto los semáforos tipo MUTEX.
