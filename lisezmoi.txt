@@ -1,0 +1,97 @@
+********************************
+ DuinOS v0.3 Alpha
+********************************
+
+Copyright (C) 2009 Multiplo
+http://multiplo.org
+http://robotgroup.com.ar
+Créé par Julián U. da Silva Gillig.
+
+DuinOS 0.3.0 Alpha est basé sur le noyau v6.1.0 de FreeRTOS. Veuillez consulter la section sur 
+la licence ci-dessous. Ceci est notre unique distribution de DuinOS, qui inclut le code source complet. 
+La dernière version est toujours disponible sur le site de RobotGroup. NdT : au 16/12/2010, il n'y a rien sur ce site. 
+
+
+********************************
+ Licence
+********************************
+
+Le noyau DuinOS (cores\arduino.DuinOS) est sous la même licence que le système d'exploitation FreeRTOS.(www.freertos.org)
+Veuillez consulter le fichier FreeRTOS.license.txt inclut dans notre distribution DuinOS.
+
+Nous avons utilisé aussi certains fichiers appartenant au port AVR du système d'exploitation FreeRTOS. 
+Ces fichiers ont été créés par Micropendous. Comme ces fichiers sont des fichiers FreeRTOS modifiés, 
+nous considérons (comprenons) qu'ils sont sous la même licence que le noyau FreeRTOS. Nous sommes reconnaissants 
+à Opendous Inc. pour leur précieuse contribution à la communauté open source. S'il y a d'autres fichiers provenant 
+du projet Micropendous, ceux-ci peuvent être sous la licence suivante:
+
+Droits d'auteurs (Copyright) sous la licence Creative Commons Attribution 
+http://creativecommons.org/licenses/by/3.0/
+Par Opendous Inc. 
+www.Micropendous.org
+4 Octobre 2009
+
+Veuillez consulter le site web www.micropendous.org en cas de doutes.
+
+NOTE: Nous croyons fermement dans la paix, de sorte que nous ne voudrions pas voir notre travail dans n'importe 
+quel projet non-civil ou militaire. Mais en raison de la licence GPL modifié de FreeRTOS que nous devons maintenir, 
+ce n'est uniquement qu'une recommandation et une expression de nos souhaits.
+ 
+********************************
+ Installation de DuinOS 
+********************************
+
+1. Fermer le logiciel de l'environnement de développement (IDE) Arduino (toutes les fenêtres/instances).
+2. Copier le répertoire arduino.DuinOS dans le répertoire \hardware\arduino\cores de celui de l'IDE Arduino.
+3. Renommer votre fichier actuel \hardware\arduino\boards.txt en par exemple boards.txt.ORI
+4. Copier le fichier hardware\boards.txt à installer avec DuinOS dans le répertoire \hardware\arduino de l'IDE Arduino.
+5. Renommer votre fichier actuel \lib\keywords.txt en par exemple keywords.txt.ORI.
+6. Copier le fichier lib\keywords.txt à installer avec DuinOS dans le répertoire \lib de l'IDE Arduino.
+7. Lancer l'environnement de développement (IDE) Arduino.
+8. Veuillez sélectionner n'importe quelle carte DuinOS depuis le menu Tools->Board, comme par exemple la "Arduino Duemilanove ou Nano w/ ATmega328 + DuinOS".
+9. Maintenant, vous pouvez compiler n'importe quel projet standard, mais nous vous suggérons de tester l'exemple \examples\MoreComplexBlinking qui a été installé avec DuinOS.
+
+********************************
+Désinstaller DuinOS 
+********************************
+
+0. Fermer le logiciel de l'environnement de développement (IDE) Arduino (toutes les fenêtres/instances).
+1. Si vous avez renommé le fichier d'origine boards.txt, supprimer le fichier actuel boards.txt et renommer l'ancien/précédent (ainsi il redeviendra votre fichier boards.txt).
+2. 1. Si vous avez renommé le fichier d'origine keywords.txt, supprimer le fichier actuel keywords.txt et renommer l'ancien/précédent (ainsi il redeviendra votre fichier keywords.txt).
+3. Supprimer le répertoire arduino.DuinOS dans le répertoire \cores de l'IDE Arduino.
+4. Maintenant, vous pouvez relancer l'environnement de développement (IDE) Arduino et le faire fonctionner sans DuinOS.  
+
+********************************
+ AVERTISSEMENT 
+********************************
+
+LE LOGICIEL (ET TOUT AUTRE CONTENU) EST FOURNI "TEL QUEL", SANS GARANTIE D'AUCUNE SORTE, EXPLICITE OU IMPLICITE, Y COMPRIS, 
+MAIS SANS S'Y LIMITER, LES GARANTIES DE QUALITÉ MARCHANDE, D'ADAPTATION À UN USAGE PARTICULIER ET D'ABSENCE DE CONTREFAÇON. 
+EN AUCUN CAS LES AUTEURS ET LES TITULAIRES DES DROITS NE SAURAIENT ÊTRE TENUS RESPONSABLES DE TOUT DOMMAGE, RÉCLAMATION OU 
+AUTRE RESPONSABILITÉ, QUE CE SOIT DANS LE CADRE D'UN CONTRAT, UN TORT OU AUTRE, PROVENANT DE, DE OU EN RELATION AVEC LE 
+CONTENU DE CE SITE OU L'UTILISATION D'AUTRES ELEMENTS SUR CE SITE WEB. 
+
+********************************
+ History / Change log
+********************************
+
+* 0.1.0 Alpha du 02 Novembre 2009 (Julián U. da Silva Gillig. - http://robotgroup.com.ar )
+- première version sortie et publique. - version basée sur FreeRTOS 5.4.2
+- prévu pour s'intégrer et fonctionner avec l'IDE d'Arduino en version 0017
+- ajout d'un exemple MoreComplexBlinking (fait clignoter 2 LEDs)
+
+* 0.2.0 Alpha du 30 Juin 2010 (Michael Grigorev aka CHERTS <sleuthhound@gmail.com>):
+- version basée sur FreeRTOS 6.0.5.
+- prévu pour s'intégrer et fonctionner avec l'IDE d'Arduino en version 0018
+- ajout d'un nouveau exemple MoreComplexBlinkingAndSound (fait clignoter 2 LEDs et jouer un son) 
+
+* 0.3.0 Alpha du 19 Décembre 2010 (Yannick LE NY <yleny@nospam@laposte.net>):
+- version basée sur FreeRTOS 6.1.0.
+- prévu pour s'intégrer et fonctionner avec l'IDE d'Arduino en version 0021
+- ajout de la librairie mprintf - a thread safe printf called mprintf
+  (Développé par Paula Keezer http://www.out--there.com/blog/mprintf-a-thread-safe-printf-mprintf-library/ )
+- ajout de la librairie cserial - - two c functions are required so that stdout can be initialized for the stdio library - This binds the printf function to the hardware serial port
+  (Développé par Paula Keezer http://www.out--there.com/blog/mprintf-thread-safe-freertos-printf-part/  )
+- ajout de la librairie CPPLib - add the new() and delete() operators, (with very common and well known iplementations) and the function that allows to have virtual pure destructors.
+  (Développé par Julián U. da Silva Gillig. - http://robotgroup.com.ar )
+
