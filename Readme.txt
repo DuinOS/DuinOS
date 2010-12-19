@@ -1,13 +1,13 @@
 ********************************
- DuinOS v0.2 Alpha
+ DuinOS v0.3 Alpha
 ********************************
 
 Copyright (C) 2009 Multiplo
 http://multiplo.org
 http://robotgroup.com.ar
-Created by Juli�n U. da Silva Gillig.
+Created by Julián U. da Silva Gillig.
 
-Based on the FreeRTOS v6.0.5 kernel (www.freertos.org). Please see the License section below.
+Based on the FreeRTOS v6.1.0 kernel (www.freertos.org). Please see the License section below.
 This is our only distribution of DuinOS, which includes the complete source code. The last version is always available
 from http://robotgroup.com.ar
 
@@ -50,6 +50,15 @@ our wishes.
 7. Please select any DuinOS board from the Tools->Board menu, like the "Arduino Duemilanove or Nano w/ ATmega328 + DuinOS".
 8. Now, you can compile any standard project, but we suggest the \examples\MoreComplexBlinking deployed with DuinOS.
 
+********************************
+ Uninstall 
+********************************
+
+0. Close the Arduino IDE (all instances).
+1. If you have renamed the original boards.txt file, delete the current boards.txt file and rename the previous one (so it will be now your new boards.txt).
+2. If you have renamed the original keywords.txt file, delete the current keywords.txt file and rename the previous one (so it will be now your new keywords.txt).
+3. Delete the arduino.DuinOS folder from the \cores folder.
+4. Now you can restart the Arduino IDE and keep working without DuinOS. 
 
 ********************************
  DISCLAIMER
@@ -66,10 +75,25 @@ MATERIALS ON THIS WEBSITE.
  History / Change log
 ********************************
 
-2010.06.30 (Michael Grigorev aka CHERTS <sleuthhound@gmail.com>):
-	- Arduino updated to version 0018
-	- FreeRTOS updated to version 6.0.5
-	- Add new example MoreComplexBlinkingAndSound (Blinks two LEDs and play sound)
+* 0.1.0 Alpha / 2009.11.02 (Julián U. da Silva Gillig. - http://robotgroup.com.ar )
+- First version released DuinOS v0.1 Alpha.
+- Arduino IDE updated to version 0017 ref
+- FreeRTOS updated to version 5.4.2
+- Add example MoreComplexBlinking (Blinks two LEDs)
 
-2009.11.02:
-	- First version released (DuinOS v0.1 Alpha).
+* 0.2.0 Alpha / 2010.06.30 (Michael Grigorev aka CHERTS <sleuthhound@gmail.com>):
+- Arduino IDE updated to version 0018
+- FreeRTOS updated to version 6.0.5
+- Add new example MoreComplexBlinkingAndSound (Blinks two LEDs and play sound)
+
+* 0.3.0 Alpha / 2010.12.19 (Yannick LE NY <yleny@nospam@laposte.net>):
+- Arduino IDE updated to version 0021
+- FreeRTOS updated to version 6.1.0
+- add mprintf library - a thread safe printf called mprintf
+  (Developped by Paula Keezer http://www.out--there.com/blog/mprintf-a-thread-safe-printf-mprintf-library/ )
+- add cserial library - two c functions are required so that stdout can be initialized for the stdio library - This binds the printf function to the hardware serial port
+  (Developped by Paula Keezer http://www.out--there.com/blog/mprintf-thread-safe-freertos-printf-part/ )  
+- add CPPLib library - add the new() and delete() operators, (with very common and well known iplementations) and the function that allows to have virtual pure destructors.
+  (Developped by Julián U. da Silva Gillig. - http://robotgroup.com.ar )
+ 
+ 
