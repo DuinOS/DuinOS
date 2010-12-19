@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V6.0.5 - Copyright (C) 2010 Real Time Engineers Ltd.
+    FreeRTOS V6.1.0 - Copyright (C) 2010 Real Time Engineers Ltd.
 
     ***************************************************************************
     *                                                                         *
@@ -10,7 +10,7 @@
     *    + Looking for basic training,                                        *
     *    + Wanting to improve your FreeRTOS skills and productivity           *
     *                                                                         *
-    * then take a look at the FreeRTOS eBook                                  *
+    * then take a look at the FreeRTOS books - available as PDF or paperback  *
     *                                                                         *
     *        "Using the FreeRTOS Real Time Kernel - a Practical Guide"        *
     *                  http://www.FreeRTOS.org/Documentation                  *
@@ -33,9 +33,9 @@
     FreeRTOS is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-    more details. You should have received a copy of the GNU General Public 
-    License and the FreeRTOS license exception along with FreeRTOS; if not it 
-    can be viewed here: http://www.freertos.org/a00114.html and also obtained 
+    more details. You should have received a copy of the GNU General Public
+    License and the FreeRTOS license exception along with FreeRTOS; if not it
+    can be viewed here: http://www.freertos.org/a00114.html and also obtained
     by writing to Richard Barry, contact details for whom are available on the
     FreeRTOS WEB site.
 
@@ -447,20 +447,32 @@ tskTCB * pxNewTCB;
 		}
 		#endif
 
+		if( ( void * ) pxCreatedTask != NULL )
+		{
+			/* Pass the TCB out - in an anonymous way.  The calling function/
+			task can use this as a handle to delete the task later if
+			required.*/
+			*pxCreatedTask = ( xTaskHandle ) pxNewTCB;
+		}
+		
 		/* We are going to manipulate the task queues to add this task to a
 		ready list, so must make sure no interrupts occur. */
 		portENTER_CRITICAL();
 		{
 			uxCurrentNumberOfTasks++;
-			if( uxCurrentNumberOfTasks == ( unsigned portBASE_TYPE ) 1 )
+			if( pxCurrentTCB == NULL )
 			{
-				/* As this is the first task it must also be the current task. */
+				/* There are no other tasks, or all the other tasks are in
+				the suspended state - make this the current task. */
 				pxCurrentTCB =  pxNewTCB;
 
-				/* This is the first task to be created so do the preliminary
-				initialisation required.  We will not recover if this call
-				fails, but we will report the failure. */
-				prvInitialiseTaskLists();
+				if( uxCurrentNumberOfTasks == ( unsigned portBASE_TYPE ) 1 )
+				{
+					/* This is the first task to be created so do the preliminary
+					initialisation required.  We will not recover if this call
+					fails, but we will report the failure. */
+					prvInitialiseTaskLists();
+				}
 			}
 			else
 			{
@@ -506,14 +518,6 @@ tskTCB * pxNewTCB;
 
 	if( xReturn == pdPASS )
 	{
-		if( ( void * ) pxCreatedTask != NULL )
-		{
-			/* Pass the TCB out - in an anonymous way.  The calling function/
-			task can use this as a handle to delete the task later if
-			required.*/
-			*pxCreatedTask = ( xTaskHandle ) pxNewTCB;
-		}
-
 		if( xSchedulerRunning != pdFALSE )
 		{
 			/* If the created task is of a higher priority than the current task
@@ -893,10 +897,31 @@ tskTCB * pxNewTCB;
 		}
 		portEXIT_CRITICAL();
 
-		/* We may have just suspended the current task. */
 		if( ( void * ) pxTaskToSuspend == NULL )
 		{
-			portYIELD_WITHIN_API();
+			if( xSchedulerRunning != pdFALSE )
+			{
+				/* We have just suspended the current task. */
+				portYIELD_WITHIN_API();
+			}
+			else
+			{
+				/* The scheduler is not running, but the task that was pointed
+				to by pxCurrentTCB has just been suspended and pxCurrentTCB
+				must be adjusted to point to a different task. */
+				if( uxCurrentNumberOfTasks == 1 )
+				{
+					/* No other tasks are defined, so set pxCurrentTCB back to
+					NULL so when the next task is created pxCurrentTCB will
+					be set to point to it no matter what its relative priority
+					is. */
+					pxCurrentTCB = NULL;
+				}
+				else
+				{
+					vTaskSwitchContext();
+				}
+			}
 		}
 	}
 
@@ -1172,6 +1197,12 @@ portTickType xTicks;
 	portEXIT_CRITICAL();
 
 	return xTicks;
+}
+/*-----------------------------------------------------------*/
+
+portTickType xTaskGetTickCountFromISR( void )
+{
+	return xTickCount;
 }
 /*-----------------------------------------------------------*/
 
@@ -2282,7 +2313,7 @@ tskTCB *pxNewTCB;
 
 		if( xSchedulerRunning != pdFALSE )
 		{
-			pxCurrentTCB->uxCriticalNesting++;
+			( pxCurrentTCB->uxCriticalNesting )++;
 		}
 	}
 
@@ -2297,7 +2328,7 @@ void vTaskExitCritical( void )
 	{
 		if( pxCurrentTCB->uxCriticalNesting > 0 )
 		{
-			pxCurrentTCB->uxCriticalNesting--;
+			( pxCurrentTCB->uxCriticalNesting )--;
 
 			if( pxCurrentTCB->uxCriticalNesting == 0 )
 			{

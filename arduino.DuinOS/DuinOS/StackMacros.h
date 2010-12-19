@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V6.0.5 - Copyright (C) 2010 Real Time Engineers Ltd.
+    FreeRTOS V6.1.0 - Copyright (C) 2010 Real Time Engineers Ltd.
 
     ***************************************************************************
     *                                                                         *
@@ -10,7 +10,7 @@
     *    + Looking for basic training,                                        *
     *    + Wanting to improve your FreeRTOS skills and productivity           *
     *                                                                         *
-    * then take a look at the FreeRTOS eBook                                  *
+    * then take a look at the FreeRTOS books - available as PDF or paperback  *
     *                                                                         *
     *        "Using the FreeRTOS Real Time Kernel - a Practical Guide"        *
     *                  http://www.FreeRTOS.org/Documentation                  *
@@ -33,9 +33,9 @@
     FreeRTOS is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-    more details. You should have received a copy of the GNU General Public 
-    License and the FreeRTOS license exception along with FreeRTOS; if not it 
-    can be viewed here: http://www.freertos.org/a00114.html and also obtained 
+    more details. You should have received a copy of the GNU General Public
+    License and the FreeRTOS license exception along with FreeRTOS; if not it
+    can be viewed here: http://www.freertos.org/a00114.html and also obtained
     by writing to Richard Barry, contact details for whom are available on the
     FreeRTOS WEB site.
 
@@ -63,7 +63,7 @@
  * the current stack state only - comparing the current top of stack value to
  * the stack limit.  Setting configCHECK_FOR_STACK_OVERFLOW to greater than 1
  * will also cause the last few stack bytes to be checked to ensure the value
- * to which the bytes were set when the task was created have not been 
+ * to which the bytes were set when the task was created have not been
  * overwritten.  Note this second test does not guarantee that an overflowed
  * stack will always be recognised.
  */
@@ -110,7 +110,7 @@
 	/* Only the current stack state is to be checked. */
 	#define taskFIRST_CHECK_FOR_STACK_OVERFLOW()														\
 	{																									\
-	extern void vApplicationStackOverflowHook( xTaskHandle *pxTask, signed char *pcTaskName );		\
+	extern void vApplicationStackOverflowHook( xTaskHandle *pxTask, signed char *pcTaskName );			\
 																										\
 		/* Is the currently saved stack pointer within the stack limit? */								\
 		if( pxCurrentTCB->pxTopOfStack >= pxCurrentTCB->pxEndOfStack )									\
@@ -126,8 +126,8 @@
 
 	#define taskSECOND_CHECK_FOR_STACK_OVERFLOW()																									\
 	{																																				\
-	extern void vApplicationStackOverflowHook( xTaskHandle *pxTask, signed char *pcTaskName );													\
-	static const unsigned char ucExpectedStackBytes[] = {	tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE,		\
+	extern void vApplicationStackOverflowHook( xTaskHandle *pxTask, signed char *pcTaskName );														\
+	static const unsigned char ucExpectedStackBytes[] = {	tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE,			\
 																tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE,		\
 																tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE,		\
 																tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE,		\
@@ -148,9 +148,9 @@
 
 	#define taskSECOND_CHECK_FOR_STACK_OVERFLOW()																									\
 	{																																				\
-	extern void vApplicationStackOverflowHook( xTaskHandle *pxTask, signed char *pcTaskName );													\
-	char *pcEndOfStack = ( char * ) pxCurrentTCB->pxEndOfStack;																				\
-	static const unsigned char ucExpectedStackBytes[] = {	tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE,		\
+	extern void vApplicationStackOverflowHook( xTaskHandle *pxTask, signed char *pcTaskName );														\
+	char *pcEndOfStack = ( char * ) pxCurrentTCB->pxEndOfStack;																						\
+	static const unsigned char ucExpectedStackBytes[] = {	tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE,			\
 																tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE,		\
 																tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE,		\
 																tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE, tskSTACK_FILL_BYTE,		\
