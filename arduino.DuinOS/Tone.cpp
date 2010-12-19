@@ -66,7 +66,7 @@ volatile long timer2_toggle_count;
 volatile uint8_t *timer2_pin_port;
 volatile uint8_t timer2_pin_mask;
 
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 volatile long timer3_toggle_count;
 volatile uint8_t *timer3_pin_port;
 volatile uint8_t timer3_pin_mask;
@@ -79,7 +79,7 @@ volatile uint8_t timer5_pin_mask;
 #endif
 
 
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 
 #define AVAILABLE_TONE_PINS 1
 
@@ -164,7 +164,7 @@ static int8_t toneBegin(uint8_t _pin)
         timer2_pin_mask = digitalPinToBitMask(_pin);
         break;
 
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
       case 3:
         // 16 bit timer
         TCCR3A = 0;
@@ -279,7 +279,7 @@ void tone(uint8_t _pin, unsigned int frequency, unsigned long duration)
 
       if (_timer == 1)
         TCCR1B = (TCCR1B & 0b11111000) | prescalarbits;
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
       else if (_timer == 3)
         TCCR3B = (TCCR3B & 0b11111000) | prescalarbits;
       else if (_timer == 4)
@@ -326,7 +326,7 @@ void tone(uint8_t _pin, unsigned int frequency, unsigned long duration)
         bitWrite(TIMSK2, OCIE2A, 1);
         break;
 
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
       case 3:
         OCR3A = ocr;
         timer3_toggle_count = toggle_count;
@@ -349,40 +349,28 @@ void tone(uint8_t _pin, unsigned int frequency, unsigned long duration)
 }
 
 
-void noTone(uint8_t _pin)
+// XXX: this function only works properly for timer 2 (the only one we use
+// currently).  for the others, it should end the tone, but won't restore
+// proper PWM functionality for the timer.
+void disableTimer(uint8_t _timer)
 {
-  int8_t _timer = -1;
-  
-  for (int i = 0; i < AVAILABLE_TONE_PINS; i++) {
-    if (tone_pins[i] == _pin) {
-      _timer = pgm_read_byte(tone_pin_to_timer_PGM + i);
-      tone_pins[i] = 255;
-    }
-  }
-  
   switch (_timer)
   {
-#if defined(__AVR_ATmega8__)
+#if !defined(__AVR_ATmega8__)
+    case 0:
+      TIMSK0 = 0;
+      break;
+#endif
     case 1:
       bitWrite(TIMSK1, OCIE1A, 0);
       break;
     case 2:
-      bitWrite(TIMSK2, OCIE2A, 0);
+      bitWrite(TIMSK2, OCIE2A, 0); // disable interrupt
+      TCCR2A = (1 << WGM20);
+      TCCR2B = (TCCR2B & 0b11111000) | (1 << CS22);
+      OCR2A = 0;
       break;
-
-#else
-    case 0:
-      TIMSK0 = 0;
-      break;
-    case 1:
-      TIMSK1 = 0;
-      break;
-    case 2:
-      TIMSK2 = 0;
-      break;
-#endif
-
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
     case 3:
       TIMSK3 = 0;
       break;
@@ -394,6 +382,21 @@ void noTone(uint8_t _pin)
       break;
 #endif
   }
+}
+
+
+void noTone(uint8_t _pin)
+{
+  int8_t _timer = -1;
+  
+  for (int i = 0; i < AVAILABLE_TONE_PINS; i++) {
+    if (tone_pins[i] == _pin) {
+      _timer = pgm_read_byte(tone_pin_to_timer_PGM + i);
+      tone_pins[i] = 255;
+    }
+  }
+  
+  disableTimer(_timer);
 
   digitalWrite(_pin, 0);
 }
@@ -412,7 +415,7 @@ ISR(TIMER0_COMPA_vect)
   }
   else
   {
-    TIMSK0 = 0;   // disable the interrupt
+    disableTimer(0);
     *timer0_pin_port &= ~(timer0_pin_mask);  // keep pin low after stop
   }
 }
@@ -431,7 +434,7 @@ ISR(TIMER1_COMPA_vect)
   }
   else
   {
-    TIMSK1 = 0;   // disable the interrupt
+    disableTimer(1);
     *timer1_pin_port &= ~(timer1_pin_mask);  // keep pin low after stop
   }
 }
@@ -451,14 +454,14 @@ ISR(TIMER2_COMPA_vect)
   }
   else
   {
-    TIMSK2 = 0;   // disable the interrupt
+    disableTimer(2);
     *timer2_pin_port &= ~(timer2_pin_mask);  // keep pin low after stop
   }
 }
 
 
 
-//#if defined(__AVR_ATmega1280__)
+//#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 #if 0
 
 ISR(TIMER3_COMPA_vect)
@@ -473,7 +476,7 @@ ISR(TIMER3_COMPA_vect)
   }
   else
   {
-    TIMSK3 = 0;   // disable the interrupt
+    disableTimer(3);
     *timer3_pin_port &= ~(timer3_pin_mask);  // keep pin low after stop
   }
 }
@@ -490,7 +493,7 @@ ISR(TIMER4_COMPA_vect)
   }
   else
   {
-    TIMSK4 = 0;   // disable the interrupt
+    disableTimer(4);
     *timer4_pin_port &= ~(timer4_pin_mask);  // keep pin low after stop
   }
 }
@@ -507,7 +510,7 @@ ISR(TIMER5_COMPA_vect)
   }
   else
   {
-    TIMSK5 = 0;   // disable the interrupt
+    disableTimer(5);
     *timer5_pin_port &= ~(timer5_pin_mask);  // keep pin low after stop
   }
 }

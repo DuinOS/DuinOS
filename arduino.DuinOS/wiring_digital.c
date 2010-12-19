@@ -36,8 +36,17 @@ void pinMode(uint8_t pin, uint8_t mode)
 	// JWS: can I let the optimizer do this?
 	reg = portModeRegister(port);
 
-	if (mode == INPUT) *reg &= ~bit;
-	else *reg |= bit;
+	if (mode == INPUT) { 
+		uint8_t oldSREG = SREG;
+                cli();
+		*reg &= ~bit;
+		SREG = oldSREG;
+	} else {
+		uint8_t oldSREG = SREG;
+                cli();
+		*reg |= bit;
+		SREG = oldSREG;
+	}
 }
 
 // Forcing this inline keeps the callers from having to push their own stuff
@@ -62,7 +71,7 @@ static inline void turnOffPWM(uint8_t timer)
 	if (timer == TIMER2B) cbi(TCCR2A, COM2B1);
 #endif
 
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 	if (timer == TIMER3A) cbi(TCCR3A, COM3A1);
 	if (timer == TIMER3B) cbi(TCCR3A, COM3B1);
 	if (timer == TIMER3C) cbi(TCCR3A, COM3C1);
@@ -90,8 +99,17 @@ void digitalWrite(uint8_t pin, uint8_t val)
 
 	out = portOutputRegister(port);
 
-	if (val == LOW) *out &= ~bit;
-	else *out |= bit;
+	if (val == LOW) {
+		uint8_t oldSREG = SREG;
+                cli();
+		*out &= ~bit;
+		SREG = oldSREG;
+	} else {
+		uint8_t oldSREG = SREG;
+                cli();
+		*out |= bit;
+		SREG = oldSREG;
+	}
 }
 
 int digitalRead(uint8_t pin)
