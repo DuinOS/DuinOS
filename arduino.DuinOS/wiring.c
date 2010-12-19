@@ -19,7 +19,7 @@
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
 
-  $Id: wiring.c 808 2009-12-18 17:44:08Z dmellis $
+  $Id$
 */
 
 #include "wiring_private.h"
@@ -96,13 +96,18 @@ unsigned long micros() {
 }
 
 // DuinOS overrides this function with a macro (DuinOS.h)
-/*void delay(unsigned long ms)
+/* void delay(unsigned long ms)
 {
-	unsigned long start = millis();
-	
-	while (millis() - start <= ms)
-		;
-}*/
+	uint16_t start = (uint16_t)micros();
+
+	while (ms > 0) {
+		if (((uint16_t)micros() - start) >= 1000) {
+			ms--;
+			start += 1000;
+		}
+	}
+}
+*/
 
 /* Delay for the given number of microseconds.  Assumes a 8 or 16 MHz clock. */
 void delayMicroseconds(unsigned int us)
@@ -182,20 +187,22 @@ void init()
 	sbi(TIMSK0, TOIE0);
 #endif
 
-// DuinOS: This commented code is the only difference with the standard init() function
-// (DuinOS uses the timer 1 for the preemptive kernel):
-/*
 	// timers 1 and 2 are used for phase-correct hardware pwm
 	// this is better for motors as it ensures an even waveform
 	// note, however, that fast pwm mode can achieve a frequency of up
 	// 8 MHz (with a 16 MHz clock) at 50% duty cycle
+        
+        // DuinOS: This commented code is the only difference with the standard init() function
+	// (DuinOS uses the timer 1 for the preemptive kernel):
+	/* TCCR1B = 0;
 
 	// set timer 1 prescale factor to 64
 	sbi(TCCR1B, CS11);
 	sbi(TCCR1B, CS10);
 	// put timer 1 in 8-bit phase correct pwm mode
-	sbi(TCCR1A, WGM10);
-*/
+	sbi(TCCR1A, WGM10); */
+	
+
 	// set timer 2 prescale factor to 64
 #if defined(__AVR_ATmega8__)
 	sbi(TCCR2, CS22);
@@ -209,7 +216,7 @@ void init()
 	sbi(TCCR2A, WGM20);
 #endif
 
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 	// set timer 3, 4, 5 prescale factor to 64
 	sbi(TCCR3B, CS31);	sbi(TCCR3B, CS30);
 	sbi(TCCR4B, CS41);	sbi(TCCR4B, CS40);

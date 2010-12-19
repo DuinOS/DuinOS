@@ -1,4 +1,5 @@
 #include <WProgram.h>
+// add DuinOS support
 #include "DuinOS.h"
 
 unsigned portBASE_TYPE mainLoopPriority;
