@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V6.0.5 - Copyright (C) 2010 Real Time Engineers Ltd.
+    FreeRTOS V6.1.0 - Copyright (C) 2010 Real Time Engineers Ltd.
 
     ***************************************************************************
     *                                                                         *
@@ -10,7 +10,7 @@
     *    + Looking for basic training,                                        *
     *    + Wanting to improve your FreeRTOS skills and productivity           *
     *                                                                         *
-    * then take a look at the FreeRTOS eBook                                  *
+    * then take a look at the FreeRTOS books - available as PDF or paperback  *
     *                                                                         *
     *        "Using the FreeRTOS Real Time Kernel - a Practical Guide"        *
     *                  http://www.FreeRTOS.org/Documentation                  *
@@ -53,6 +53,19 @@
 
 /* 
 
+Changes from FreeRTOS 5.4.2
+
+	+ AVR port - Adapted ATmega323 port to the AT90USB USB AVRs
+	
+FreeRTOS developper team rename variables from portCHAR to char, portLONG to long, portSHORT to short.
+But (I think) we need to keep port* variables because there are used in the file FreeRTOSConfig.h that add support for 
+Atmel AVR ATmega644, ATmega644P, ATmega1284P, AVR_ATmega1280, AVR_ATmega328P, ATmega88, ATmega88P, ATmega168, ATmega168P
+You can find information about adding support for Atmel AVR chips in Arduino Card in FreeRTOS here :
+http://www.avrfreaks.net/index.php?name=PNphpBB2&file=viewtopic&p=574737&sid=0d73d27555a0fd91faca37b6beee924e#574737
+
+
+/* 
+
 Changes from V2.6.0
 
 	+ AVR port - Replaced the inb() and outb() functions with direct memory
@@ -74,7 +87,14 @@ Changes from V2.6.0
 #define portFLAGS_INT_ENABLED					( ( portSTACK_TYPE ) 0x80 )
 
 /* Hardware constants for timer 1. */
-#define portCLEAR_COUNTER_ON_MATCH				( (unsigned portCHAR)(1 << WGM12) )
+/* Disable hardware constants for Atmel AVR ATmega323
+#define portCLEAR_COUNTER_ON_MATCH				( ( unsigned char ) 0x08 )
+#define portPRESCALE_64							( ( unsigned char ) 0x03 )
+#define portCLOCK_PRESCALER						( ( unsigned long ) 64 )
+#define portCOMPARE_MATCH_A_INTERRUPT_ENABLE	( ( unsigned char ) 0x10 )
+/*
+/* Enable hardware constants for Atmel AVR ATmega644, ATmega644P, ATmega1284P, AVR_ATmega1280, AVR_ATmega328P, ATmega88, ATmega88P, ATmega168, ATmega168P */
+#define portCLEAR_COUNTER_ON_MATCH				( (unsigned portCHAR)(1 << WGM12) ) /* remove portCLEAR_COUNTER_ON_MATCH because it is not used in timer ? */
 #define portCLOCK_PRESCALER					( (unsigned portLONG) 64 )
 
 /*-----------------------------------------------------------*/
@@ -208,7 +228,9 @@ static void prvSetupTimerInterrupt( void );
  */
 portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE pxCode, void *pvParameters )
 {
-unsigned portSHORT usAddress;
+/* Disable for Atmel AVR ATmega323
+   unsigned short usAddress; */
+   unsigned portSHORT usAddress;
 
 	/* Place a few bytes of known values on the bottom of the stack. 
 	This is just useful for debugging. */
@@ -227,11 +249,16 @@ unsigned portSHORT usAddress;
 
 	/* The start of the task code will be popped off the stack last, so place
 	it on first. */
+	/* Disable for Atmel AVR ATmega323
+	usAddress = ( unsigned short ) pxCode;
+	*pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned short ) 0x00ff ); */
 	usAddress = ( unsigned portSHORT ) pxCode;
 	*pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portSHORT ) 0x00ff );
 	pxTopOfStack--;
 
 	usAddress >>= 8;
+	/* Disable for Atmel AVR ATmega323
+	*pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned short ) 0x00ff ); */
 	*pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portSHORT ) 0x00ff );
 	pxTopOfStack--;
 
@@ -294,11 +321,16 @@ unsigned portSHORT usAddress;
 	pxTopOfStack--;
 
 	/* Place the parameter on the stack in the expected location. */
+	/* Disable for Atmel AVR ATmega323
+	usAddress = ( unsigned short ) pvParameters;
+	*pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned short ) 0x00ff ); */
 	usAddress = ( unsigned portSHORT ) pvParameters;
 	*pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portSHORT ) 0x00ff );
 	pxTopOfStack--;
 
 	usAddress >>= 8;
+	/* Disable for Atmel AVR ATmega323
+	*pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned short ) 0x00ff ); */
 	*pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portSHORT ) 0x00ff );
 	pxTopOfStack--;
 
@@ -383,7 +415,11 @@ void vPortYieldFromTick( void )
  */
 static void prvSetupTimerInterrupt( void )
 {
+/* Disable for Atmel AVR ATmega323  
+unsigned long ulCompareMatch;
+unsigned char ucHighByte, ucLowByte; */
 unsigned portLONG ulCompareMatch;
+
 
 	/* Using 16bit timer 1 to generate the tick.  Correct fuses must be
 	selected for the configCPU_CLOCK_HZ clock. */
@@ -394,13 +430,35 @@ unsigned portLONG ulCompareMatch;
 	ulCompareMatch /= portCLOCK_PRESCALER;
 
 	/* Adjust for correct value. */
+	/* Disable for Atmel AVR ATmega323  
+	ulCompareMatch -= ( unsigned long ) 1; */
 	ulCompareMatch -= ( unsigned portLONG ) 1;
 
+	/* Setup compare match value for compare match A.  Interrupts are disabled 
+	before this is called so we need not worry here. */
+	/* Disable for Atmel AVR ATmega323  
+	ucLowByte = ( unsigned char ) ( ulCompareMatch & ( unsigned long ) 0xff );
+	ulCompareMatch >>= 8;
+	ucHighByte = ( unsigned char ) ( ulCompareMatch & ( unsigned long ) 0xff );
+	OCR1AH = ucHighByte;
+	OCR1AL = ucLowByte; */
 	OCR1A = ulCompareMatch;
-	TCCR1A = 0;
-	TCCR1B = ((1 << CS10) | (1 << CS11) | (1 << WGM12));
-	TIMSK1 = (1 << OCIE1A);
 
+	/* Setup clock source and compare match behaviour. */
+	/* Disable for Atmel AVR ATmega323  
+	ucLowByte = portCLEAR_COUNTER_ON_MATCH | portPRESCALE_64;
+	TCCR1B = ucLowByte; */
+	TCCR1A = 0;
+	// CS10 and CS11 will set a prescale value of 64
+	TCCR1B = ((1 << CS10) | (1 << CS11) | (1 << WGM12));
+
+	/* Enable the interrupt - this is okay as interrupt are currently globally
+	disabled. */
+	/* Disable for Atmel AVR ATmega323  
+	ucLowByte = TIMSK;
+	ucLowByte |= portCOMPARE_MATCH_A_INTERRUPT_ENABLE;
+	TIMSK = ucLowByte; */
+	TIMSK1 = (1 << OCIE1A);
 }
 /*-----------------------------------------------------------*/
 
@@ -411,6 +469,9 @@ unsigned portLONG ulCompareMatch;
 	 * the context is saved at the start of vPortYieldFromTick().  The tick
 	 * count is incremented after the context is saved.
 	 */
+	/* Disable for Atmel AVR ATmega323  
+	void SIG_OUTPUT_COMPARE1A( void ) __attribute__ ( ( signal, naked ) );
+	void SIG_OUTPUT_COMPARE1A( void ) */
 	void TIMER1_COMPA_vect( void ) __attribute__ ( ( signal, naked ) );
 	void TIMER1_COMPA_vect( void )
 	{
@@ -424,6 +485,9 @@ unsigned portLONG ulCompareMatch;
 	 * tick count.  We don't need to switch context, this can only be done by
 	 * manual calls to taskYIELD();
 	 */
+	/* Disable for Atmel AVR ATmega323  
+	void SIG_OUTPUT_COMPARE1A( void ) __attribute__ ( ( signal ) );
+	void SIG_OUTPUT_COMPARE1A( void ) */
 	void TIMER1_COMPA_vect( void ) __attribute__ ( ( signal ) );
 	void TIMER1_COMPA_vect( void )
 	{
