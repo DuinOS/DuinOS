@@ -1,5 +1,22 @@
 ##############################################################
 
+uno.name=Arduino Uno
+uno.upload.protocol=stk500
+uno.upload.maximum_size=32256
+uno.upload.speed=115200
+uno.bootloader.low_fuses=0xff
+uno.bootloader.high_fuses=0xde
+uno.bootloader.extended_fuses=0x05
+uno.bootloader.path=optiboot
+uno.bootloader.file=optiboot_atmega328.hex
+uno.bootloader.unlock_bits=0x3F
+uno.bootloader.lock_bits=0x0F
+uno.build.mcu=atmega328p
+uno.build.f_cpu=16000000L
+uno.build.core=arduino
+
+##############################################################
+
 atmega328.name=Arduino Duemilanove or Nano w/ ATmega328
 
 atmega328.upload.protocol=stk500
@@ -80,7 +97,27 @@ diecimila_DuinOS.build.core=arduino.DuinOS
 
 ##############################################################
 
-mega.name=Arduino Mega
+mega2560.name=Arduino Mega 2560
+
+mega2560.upload.protocol=stk500v2
+mega2560.upload.maximum_size=258048
+mega2560.upload.speed=115200
+
+mega2560.bootloader.low_fuses=0xFF
+mega2560.bootloader.high_fuses=0xD8
+mega2560.bootloader.extended_fuses=0xFD
+mega2560.bootloader.path=stk500v2
+mega2560.bootloader.file=stk500boot_v2_mega2560.hex
+mega2560.bootloader.unlock_bits=0x3F
+mega2560.bootloader.lock_bits=0x0F
+
+mega2560.build.mcu=atmega2560
+mega2560.build.f_cpu=16000000L
+mega2560.build.core=arduino
+
+##############################################################
+
+mega.name=Arduino Mega (ATmega1280)
 
 mega.upload.protocol=stk500
 mega.upload.maximum_size=126976
@@ -100,7 +137,7 @@ mega.build.core=arduino
 
 ##############################################################
 
-mega_DuinOS.name=Arduino Mega + DuinOS
+mega_DuinOS.name=Arduino Mega (ATmega1280) + DuinOS
 
 mega_DuinOS.upload.protocol=stk500
 mega_DuinOS.upload.maximum_size=126976
@@ -140,7 +177,48 @@ mini.build.core=arduino
 
 ##############################################################
 
-bt.name=Arduino BT
+fio.name=Arduino Fio
+
+fio.upload.protocol=stk500
+fio.upload.maximum_size=30720
+fio.upload.speed=57600
+
+fio.bootloader.low_fuses=0xFF
+fio.bootloader.high_fuses=0xDA
+fio.bootloader.extended_fuses=0x05
+fio.bootloader.path=arduino:atmega
+fio.bootloader.file=ATmegaBOOT_168_atmega328_pro_8MHz.hex
+fio.bootloader.unlock_bits=0x3F
+fio.bootloader.lock_bits=0x0F
+
+fio.build.mcu=atmega328p
+fio.build.f_cpu=8000000L
+fio.build.core=arduino:arduino
+
+##############################################################
+
+bt328.name=Arduino BT w/ ATmega328
+
+bt328.upload.protocol=stk500
+bt328.upload.maximum_size=28672
+bt328.upload.speed=19200
+bt328.upload.disable_flushing=true
+
+bt328.bootloader.low_fuses=0xff
+bt328.bootloader.high_fuses=0xd8
+bt328.bootloader.extended_fuses=0x05
+bt328.bootloader.path=bt
+bt328.bootloader.file=ATmegaBOOT_168_atmega328_bt.hex
+bt328.bootloader.unlock_bits=0x3F
+bt328.bootloader.lock_bits=0x0F
+
+bt328.build.mcu=atmega328p
+bt328.build.f_cpu=16000000L
+bt328.build.core=arduino
+
+##############################################################
+
+bt.name=Arduino BT w/ ATmega168
 
 bt.upload.protocol=stk500
 bt.upload.maximum_size=14336
@@ -198,6 +276,46 @@ lilypad.bootloader.lock_bits=0x0F
 lilypad.build.mcu=atmega168
 lilypad.build.f_cpu=8000000L
 lilypad.build.core=arduino
+
+##############################################################
+
+pro5v328.name=Arduino Pro or Pro Mini (5V, 16 MHz) w/ ATmega328
+
+pro5v328.upload.protocol=stk500
+pro5v328.upload.maximum_size=30720
+pro5v328.upload.speed=57600
+
+pro5v328.bootloader.low_fuses=0xFF
+pro5v328.bootloader.high_fuses=0xDA
+pro5v328.bootloader.extended_fuses=0x05
+pro5v328.bootloader.path=atmega
+pro5v328.bootloader.file=ATmegaBOOT_168_atmega328.hex
+pro5v328.bootloader.unlock_bits=0x3F
+pro5v328.bootloader.lock_bits=0x0F
+
+pro5v328.build.mcu=atmega328p
+pro5v328.build.f_cpu=16000000L
+pro5v328.build.core=arduino
+
+##############################################################
+
+pro5v.name=Arduino Pro or Pro Mini (5V, 16 MHz) w/ ATmega168
+
+pro5v.upload.protocol=stk500
+pro5v.upload.maximum_size=14336
+pro5v.upload.speed=19200
+
+pro5v.bootloader.low_fuses=0xff
+pro5v.bootloader.high_fuses=0xdd
+pro5v.bootloader.extended_fuses=0x00
+pro5v.bootloader.path=atmega
+pro5v.bootloader.file=ATmegaBOOT_168_diecimila.hex
+pro5v.bootloader.unlock_bits=0x3F
+pro5v.bootloader.lock_bits=0x0F
+
+pro5v.build.mcu=atmega168
+pro5v.build.f_cpu=16000000L
+pro5v.build.core=arduino
 
 ##############################################################
 
