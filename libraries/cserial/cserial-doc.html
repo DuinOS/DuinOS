@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head><meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>cserial documentation</title></head><body>
+<h2 class="entry-title">mprintf: a simple thread safe printf for DuinoOS Part A: Getting non threaded printf to work</h2>
+
+				
+<div class="entry-content">
+<p>I thought it best that I document how I got printf to work and how I 
+made it thread safe for DuinoOS (or freeRTOS for that matter)</p>
+<p><strong>Getting non threaded printf to work.</strong></p>
+<p>printf makes use of a file handle called stdout.  This file handle is
+ null unless we do something to change its value.  the stdio library 
+provides us with a method to initialize its value.  We, however, must 
+initialize the serial port and provide a function for stdio to use when 
+it needs to send a character to stdio.</p>
+<p>The stdio routine we use to initialize stdout is:  <strong><em>fdevopen(&lt;function name&gt;,NULL)</em></strong>.</p>
+<p><em>update 20100320:&nbsp; Daniel Haney, std@salversan.org provided the 
+following comment and improvement which I have implemented.&nbsp; The latest 
+cserial.cpp file contains the needed changes.<br>
+</em></p>
+<p><em>&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;snip&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;<br>
+</em></p>
+<p>Thanks for your wonderfully concise code for redefining stdout. 
+Reading  through stdio.h for avr-gcc, they say fdevopen() implicitly 
+calls  malloc, which is problematic given the Arduino&#8217;s small memory.<br>
+They recommend using fdev_setup_stream(). It works and I seem to gain  ~200 bytes.</p>
+<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;end snip&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;</p>
+<p>We need to create two routines. One that we use as a call back 
+function to be passed into the fdevopen routine and one that we will use
+ in our sketch or c/c++ code to initialize our port and initialized 
+fdevopen.  We will use two files.   &#8216;cserial.cpp&#8217; file and a &#8216;cserial.h&#8217;
+ file.  The &#8216;cserial.h&#8217; file will be included in our sketch/c/c++ file 
+so that we have access to call the initialization routine.  The source 
+of the two files are located at the bottom of this blog entry</p>
+<p>These two files must be placed into 
+~/arduino-0017/hardware/libraries/cserial directory or equivalent.  We 
+may need to create this directory.</p>
+<p>We can now use the initialization routine: 
+serial_stdout_init(&lt;speed&gt;) in our sketches (or c or c++) setup 
+function.  Add a line that looks like this:</p>
+<p>serial_stdout_init(9600);</p>
+<p>Don&#8217;t forget to add the cserial.h include file at the top of your the sketch (or program)</p>
+<p>We can now use the non-threaded version of printf which should be 
+fine using the standard Arduino.  Next, how to make a thread safe 
+version..</p>
+<p>&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211; files&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-</p>
+<p>cserial.h</p>
+<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;snip&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;</p>
+<p>#ifndef cserial_h<br>
+#define cserial_h</p>
+<p>#include &lt;stdio.h&gt;</p>
+<p>static int serial_write(char,FILE);<br>
+void serial_stdout_init(long);</p>
+<p>#endif</p>
+<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;end 
+snip&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;</p>
+<p>cserial.cpp</p>
+<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;snip&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;</p>
+<p>/* cserial.cpp */<br>
+// these two c functions are required so that<br>
+// stdout can be initialized for the stdio library<br>
+// This binds the printf function to the hardware serial port</p>
+<p>#include &#8220;cserial.h&#8221;<br>
+#include &#8220;wiring_private.h&#8221;</p>
+<p>static int serial_write(char c, FILE *f) {</p>
+<p>/* Wait for transmit buffer to be empty */<br>
+while ((UCSR0A &amp; _BV(UDRE0)) == 0)<br>
+;</p>
+<p>/* Put byte into transmit buffer */<br>
+UDR0 = c;</p>
+<p>return 0;<br>
+}</p>
+<p>static FILE sio_stdout = {0}
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+/* added to support the DH mod eliminating stdio malloc requirements */</p>
+<p>void serial_stdout_init (long speed) {<br>
+/* Set baud rate */<br>
+uint16_t factor = (F_CPU / 16 + speed / 2) / speed &#8211; 1;<br>
+UBRR0H = factor &gt;&gt; 8;<br>
+UBRR0L = factor;</p>
+<p>/* Set format (8N1) */<br>
+UCSR0C = 3 &lt;&lt; UCSZ00;</p>
+<p>/* Enable transmitter */</p>
+<p>UCSR0B = _BV(TXEN0);</p>
+<p>/* Set up stdout to write to the serial port */<br>
+/* stdout = fdevopen (serial_write, NULL);&nbsp; replaced with the following care of DH */</p>
+<p>fdev_setup_stream(&amp;sio_stdout, serial_write,  NULL,_FDEV_SETUP_WRITE);<br>
+stdout = &amp;sio_stdout ;</p>
+<p>}</p>
+<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;end snip&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;<br>
+</p>
+<p>Source : <a href="http://www.out--there.com/blog/mprintf-thread-safe-freertos-printf-part/">http://www.out--there.com/blog/mprintf-thread-safe-freertos-printf-part/</a><br>
+Date : <abbr class="published" title="2010-01-10T23:43:21+0000">Sunday, January 10, 2010</abbr></p>
+
+
+				</div>
+</body></html>

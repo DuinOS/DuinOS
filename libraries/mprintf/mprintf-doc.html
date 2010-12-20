@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head><meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>mprintf documentation</title></head><body>
+<h2 class="entry-title">mprintf: A thread safe printf: mprintf library</h2>
+
+				
+<div class="entry-content">
+<p>So, I decided to take this one step further and build a library that 
+hides the details of the mutex and variadic macro.  To use the library 
+you will need to:</p>
+<ol><li>Go into your libraries directory and make a new directory called &#8216;mprintf&#8217;</li><li>Copy these two files into the new directory;  mprintf.h mprintf.cpp</li><li>Put the #include &lt;mprintf.h&gt; and #include &lt;cserial.h&gt; into all the sketches or programs that will be using mprintf.</li><li>Put the following two statements at the beginning of your setup() function</li></ol>
+<p>serial_stdout_init(9600);<br>
+mprintf_init();</p>
+<p style="padding-left: 30px;">5. use mprintf the same way you would use printf</p>
+<p style="padding-left: 30px;">example: mprintf(&#8220;hello world\n&#8221;);</p>
+<p style="padding-left: 30px; text-align: left;">Update:<em> 20100118:&nbsp; 
+make sure your freeRTOS task has more then the minimum stack.&nbsp; mprintf 
+will not work properly for some value conversions (like int or decimal 
+or anything that requires addition stack depth).&nbsp; I increased by 2 X (2 *
+ configMINIMAL_STACK_SIZE) and all is well for a while.&nbsp; I&#8217;m working on 
+getting some kind of high water stack report by task so we can see when 
+things are getting read to blow up!).&nbsp; Note, tasks use stack for their 
+local variables.&nbsp; Global variables (not welcome) are safer until a good 
+method of reporting predicted stack usage can be generated from the 
+compiler.&nbsp; Thoughts? send them to me!<br>
+</em></p>
+<p style="padding-left: 30px; text-align: left;"><em>source : <a href="http://www.out--there.com/blog/mprintf-a-thread-safe-printf-mprintf-library/">http://www.out--there.com/blog/mprintf-a-thread-safe-printf-mprintf-library/<br>
+</a>date : </em><abbr class="published" title="2010-01-12T22:38:25+0000">Tuesday, January 12, 2010</abbr></p>
+
+
+				</div>
+</body></html>
