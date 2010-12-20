@@ -245,7 +245,8 @@
 	//##For these bigger cpus, it's possible to define more priorities if necessary:
 	#define configMAX_PRIORITIES		( ( unsigned portBASE_TYPE ) 3 )
 	#define configMINIMAL_STACK_SIZE	( ( unsigned portSHORT ) 85 )
-	#define configTOTAL_HEAP_SIZE		( (size_t ) ( 800 ) )
+	//20101220 : decrease heap size from 800 to 500 - see http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1256745982/46#46
+	#define configTOTAL_HEAP_SIZE		( (size_t ) ( 500 ) )
 	//#define configMAX_TASK_NAME_LEN		( 8 )
 	#define configMAX_TASK_NAME_LEN		( 16 )
 	#define configUSE_TRACE_FACILITY	0

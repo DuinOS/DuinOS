@@ -95,5 +95,9 @@ MATERIALS ON THIS WEBSITE.
   (Developped by Paula Keezer http://www.out--there.com/blog/mprintf-thread-safe-freertos-printf-part/ )  
 - add CPPLib library - add the new() and delete() operators, (with very common and well known iplementations) and the function that allows to have virtual pure destructors.
   (Developped by Julián U. da Silva Gillig. - http://robotgroup.com.ar )
+- Because Serial Outpout doesn't work with DuinOS and AtMega 88, 88P, 168 and 168P, decrease TOTAL_HEAP_SIZE from 800 to 500
+  Reported by Chumbud
+  Test Code : http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1256745982/39#39
+  Workaround : http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1256745982/46#46
  
  

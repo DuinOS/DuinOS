@@ -94,4 +94,8 @@ CONTENU DE CE SITE OU L'UTILISATION D'AUTRES ELEMENTS SUR CE SITE WEB.
   (Développé par Paula Keezer http://www.out--there.com/blog/mprintf-thread-safe-freertos-printf-part/  )
 - ajout de la librairie CPPLib - add the new() and delete() operators, (with very common and well known iplementations) and the function that allows to have virtual pure destructors.
   (Développé par Julián U. da Silva Gillig. - http://robotgroup.com.ar )
+- Parce la sortie série (Serial Outpout) ne fonctionne pas avec DuinOS et les puces AtMega 88, 88P, 168 et 168P, baisse de la valeur de la variable TOTAL_HEAP_SIZE de 800 à 500
+  Tapporté par Chumbud
+  Code de test du bug : http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1256745982/39#39
+  Contournement du bug : http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1256745982/46#46
 
