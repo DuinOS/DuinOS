@@ -98,4 +98,9 @@ CONTENU DE CE SITE OU L'UTILISATION D'AUTRES ELEMENTS SUR CE SITE WEB.
   Tapporté par Chumbud
   Code de test du bug : http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1256745982/39#39
   Contournement du bug : http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1256745982/46#46
-
+- Ajout de la librairie patchée Servo (provenant d'Arduino IDE 0021) avec le Timer1 désactivé parce que DuinOS utilse le timer 1 pour son noyau.
+  Mainteant devrait fonctionner uniquement avec les puces AtMega 128, 1280, 1281, 2560, 2561, 32U4, AT90USB646, AT90USB1286
+  A besoin de tests.
+- Ajout de la librairie ServoTimer2 pour remplacer la librairie Servo pour AtMega 88,168,328,644 - utilise Timer2 en 8 bits pour gérer jusqu'à 8 servos
+  Site web de la librairie ServoTimer2 : http://code.google.com/p/tricopter/source/browse/trunk/arduino/#arduino%2Flibraries%2FServoTimer2
+  A besoin de tests.

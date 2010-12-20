@@ -99,5 +99,11 @@ MATERIALS ON THIS WEBSITE.
   Reported by Chumbud
   Test Code : http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1256745982/39#39
   Workaround : http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1256745982/46#46
+- Add patched Servo lib (from Arduino IDE 0021) with Timer1 disabled because DuinOS uses the timer 1 for its kernel.
+  Now should works only with AtMega 128, 1280, 1281, 2560, 2561, 32U4, AT90USB646, AT90USB1286
+  Need testing
+- add ServoTimer2 lib to replace Servo for AtMega 88,168,328,644 - use the 8 bits Timer2 to manage up to 8 servos
+  ServoTimer2 lib website : http://code.google.com/p/tricopter/source/browse/trunk/arduino/#arduino%2Flibraries%2FServoTimer2
+  Need testing
  
  
