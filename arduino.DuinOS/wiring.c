@@ -41,7 +41,12 @@ volatile unsigned long timer0_overflow_count = 0;
 volatile unsigned long timer0_millis = 0;
 static unsigned char timer0_fract = 0;
 
-SIGNAL(TIMER0_OVF_vect)
+// add this part for Timer 0 with Arduino kernel
+#if 0
+  SIGNAL(TIMER0_OVF_vect)
+#else
+  void arduino_increment_millis()
+#endif  
 {
 	// copy these to local variables so they can be stored in registers
 	// (volatile variables must be read from memory on every access)
@@ -192,15 +197,13 @@ void init()
 	// note, however, that fast pwm mode can achieve a frequency of up
 	// 8 MHz (with a 16 MHz clock) at 50% duty cycle
         
-        // DuinOS: This commented code is the only difference with the standard init() function
-	// (DuinOS uses the timer 1 for the preemptive kernel):
-	/* TCCR1B = 0;
+	TCCR1B = 0;
 
 	// set timer 1 prescale factor to 64
 	sbi(TCCR1B, CS11);
 	sbi(TCCR1B, CS10);
 	// put timer 1 in 8-bit phase correct pwm mode
-	sbi(TCCR1A, WGM10); */
+	sbi(TCCR1A, WGM10);
 	
 
 	// set timer 2 prescale factor to 64

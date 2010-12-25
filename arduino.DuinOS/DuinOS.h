@@ -1,6 +1,10 @@
 #ifndef DuinOS__h
 #define DuinOS__h
 
+#ifndef FREERTOS_ARDUINO
+  #define FREERTOS_ARDUINO 1
+#endif
+
 #ifdef __cplusplus
 extern "C"
 {

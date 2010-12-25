@@ -228,7 +228,7 @@ static void prvSetupTimerInterrupt( void );
  */
 portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE pxCode, void *pvParameters )
 {
-/* Disable for Atmel AVR ATmega323
+/* Disable this part for Atmel AVR ATmega323
    unsigned short usAddress; */
    unsigned portSHORT usAddress;
 
@@ -249,7 +249,7 @@ portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE
 
 	/* The start of the task code will be popped off the stack last, so place
 	it on first. */
-	/* Disable for Atmel AVR ATmega323
+	/* Disable this part for Atmel AVR ATmega323
 	usAddress = ( unsigned short ) pxCode;
 	*pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned short ) 0x00ff ); */
 	usAddress = ( unsigned portSHORT ) pxCode;
@@ -257,7 +257,7 @@ portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE
 	pxTopOfStack--;
 
 	usAddress >>= 8;
-	/* Disable for Atmel AVR ATmega323
+	/* Disable this part for Atmel AVR ATmega323
 	*pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned short ) 0x00ff ); */
 	*pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portSHORT ) 0x00ff );
 	pxTopOfStack--;
@@ -321,7 +321,7 @@ portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE
 	pxTopOfStack--;
 
 	/* Place the parameter on the stack in the expected location. */
-	/* Disable for Atmel AVR ATmega323
+	/* Disable this part for Atmel AVR ATmega323
 	usAddress = ( unsigned short ) pvParameters;
 	*pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned short ) 0x00ff ); */
 	usAddress = ( unsigned portSHORT ) pvParameters;
@@ -329,7 +329,7 @@ portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE
 	pxTopOfStack--;
 
 	usAddress >>= 8;
-	/* Disable for Atmel AVR ATmega323
+	/* Disable this part for Atmel AVR ATmega323
 	*pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned short ) 0x00ff ); */
 	*pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portSHORT ) 0x00ff );
 	pxTopOfStack--;
@@ -402,6 +402,8 @@ void vPortYieldFromTick( void ) __attribute__ ( ( naked ) );
 void vPortYieldFromTick( void )
 {
 	portSAVE_CONTEXT();
+	/* add the new function arduino_increment_millis() for Timer in Arduino kernel */
+	arduino_increment_millis();
 	vTaskIncrementTick();
 	vTaskSwitchContext();
 	portRESTORE_CONTEXT();
@@ -415,28 +417,29 @@ void vPortYieldFromTick( void )
  */
 static void prvSetupTimerInterrupt( void )
 {
-/* Disable for Atmel AVR ATmega323  
+/* Disable this part for Atmel AVR ATmega323  
 unsigned long ulCompareMatch;
 unsigned char ucHighByte, ucLowByte; */
 unsigned portLONG ulCompareMatch;
 
-
+// timer 0 will be used in Arduino, and it's setup by the Arduino lib
+#ifndef FREERTOS_ARDUINO
+		
 	/* Using 16bit timer 1 to generate the tick.  Correct fuses must be
 	selected for the configCPU_CLOCK_HZ clock. */
-
 	ulCompareMatch = configCPU_CLOCK_HZ / configTICK_RATE_HZ;
 
 	/* We only have 16 bits so have to scale to get our required tick rate. */
 	ulCompareMatch /= portCLOCK_PRESCALER;
 
 	/* Adjust for correct value. */
-	/* Disable for Atmel AVR ATmega323  
+	/* Disable this part for Atmel AVR ATmega323  
 	ulCompareMatch -= ( unsigned long ) 1; */
 	ulCompareMatch -= ( unsigned portLONG ) 1;
 
 	/* Setup compare match value for compare match A.  Interrupts are disabled 
 	before this is called so we need not worry here. */
-	/* Disable for Atmel AVR ATmega323  
+	/* Disable this part for Atmel AVR ATmega323  
 	ucLowByte = ( unsigned char ) ( ulCompareMatch & ( unsigned long ) 0xff );
 	ulCompareMatch >>= 8;
 	ucHighByte = ( unsigned char ) ( ulCompareMatch & ( unsigned long ) 0xff );
@@ -445,7 +448,7 @@ unsigned portLONG ulCompareMatch;
 	OCR1A = ulCompareMatch;
 
 	/* Setup clock source and compare match behaviour. */
-	/* Disable for Atmel AVR ATmega323  
+	/* Disable this part  for Atmel AVR ATmega323  
 	ucLowByte = portCLEAR_COUNTER_ON_MATCH | portPRESCALE_64;
 	TCCR1B = ucLowByte; */
 	TCCR1A = 0;
@@ -454,46 +457,88 @@ unsigned portLONG ulCompareMatch;
 
 	/* Enable the interrupt - this is okay as interrupt are currently globally
 	disabled. */
-	/* Disable for Atmel AVR ATmega323  
+	/* Disable this part for Atmel AVR ATmega323  
 	ucLowByte = TIMSK;
 	ucLowByte |= portCOMPARE_MATCH_A_INTERRUPT_ENABLE;
 	TIMSK = ucLowByte; */
 	TIMSK1 = (1 << OCIE1A);
+#endif
 }
 /*-----------------------------------------------------------*/
 
-#if configUSE_PREEMPTION == 1
+#ifdef FREERTOS_ARDUINO
+    void arduino_increment_millis();
+   
+  #if configUSE_PREEMPTION == 1
 
 	/*
 	 * Tick ISR for preemptive scheduler.  We can use a naked attribute as
 	 * the context is saved at the start of vPortYieldFromTick().  The tick
 	 * count is incremented after the context is saved.
 	 */
-	/* Disable for Atmel AVR ATmega323  
+	/* Disable this part for Atmel AVR ATmega323 and replace by the line ISR(TIMER0_OVF_vect, ISR_NAKED) 
 	void SIG_OUTPUT_COMPARE1A( void ) __attribute__ ( ( signal, naked ) );
 	void SIG_OUTPUT_COMPARE1A( void ) */
-	void TIMER1_COMPA_vect( void ) __attribute__ ( ( signal, naked ) );
-	void TIMER1_COMPA_vect( void )
+	
+	ISR(TIMER0_OVF_vect, ISR_NAKED)
 	{
 		vPortYieldFromTick();
 		asm volatile ( "reti" );
 	}
-#else
+  #else
 
 	/*
 	 * Tick ISR for the cooperative scheduler.  All this does is increment the
 	 * tick count.  We don't need to switch context, this can only be done by
 	 * manual calls to taskYIELD();
 	 */
-	/* Disable for Atmel AVR ATmega323  
+	/* Disable this part for Atmel AVR ATmega323 and replace by TIMER0_OVF_vect 
 	void SIG_OUTPUT_COMPARE1A( void ) __attribute__ ( ( signal ) );
 	void SIG_OUTPUT_COMPARE1A( void ) */
-	void TIMER1_COMPA_vect( void ) __attribute__ ( ( signal ) );
-	void TIMER1_COMPA_vect( void )
+	
+  	void TIMER0_OVF_vect( void ) __attribute__ ( ( signal ) );
+  	void TIMER0_OVF_vect( void )
 	{
+		/* add the new function arduino_increment_millis() for Timer in Arduino kernel */
+		arduino_increment_millis();
 		vTaskIncrementTick();
 	}
-#endif
+  #endif
+#else
+  #if configUSE_PREEMPTION == 1
 
+	/*
+	 * Tick ISR for preemptive scheduler.  We can use a naked attribute as
+	 * the context is saved at the start of vPortYieldFromTick().  The tick
+	 * count is incremented after the context is saved.
+	 */
+	/* Disable this part for Atmel AVR ATmega323 and replace by the line ISR(TIMER1_OVF_vect, ISR_NAKED)
+	void SIG_OUTPUT_COMPARE1A( void ) __attribute__ ( ( signal, naked ) );
+	void SIG_OUTPUT_COMPARE1A( void ) */
+	
+	ISR(TIMER1_OVF_vect, ISR_NAKED)
+	{
+		vPortYieldFromTick();
+		asm volatile ( "reti" );
+	}
+  #else
+
+	/*
+	 * Tick ISR for the cooperative scheduler.  All this does is increment the
+	 * tick count.  We don't need to switch context, this can only be done by
+	 * manual calls to taskYIELD();
+	 */
+	/* Disable this part for Atmel AVR ATmega323 and replace by TIMER1_OVF_vect 
+	void SIG_OUTPUT_COMPARE1A( void ) __attribute__ ( ( signal ) );
+	void SIG_OUTPUT_COMPARE1A( void ) */
+	
+	ISR(TIMER1_OVF_vect, ISR_NAKED)
+	{
+		/* add the new function arduino_increment_millis() for Timer in Arduino kernel */
+		arduino_increment_millis();
+		vTaskIncrementTick();
+	}
+  #endif
+#endif
 
 	
