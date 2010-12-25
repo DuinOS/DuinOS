@@ -195,6 +195,47 @@
 	#define INCLUDE_vTaskSuspend			1
 	#define INCLUDE_vTaskDelayUntil			1
 	#define INCLUDE_vTaskDelay				1
+	
+#elif defined(__AVR_ATmega2560__)
+	//##Arduino Mega 2560? Not tested yet:
+	//##2010.12.19 reuse the same config that AVR_ATmega1280 for testing
+
+	#define configUSE_PREEMPTION		1
+	#define configUSE_IDLE_HOOK			0
+	#define configUSE_TICK_HOOK			0
+
+	//##20091029: Use compiler defined freq.:
+	#define configCPU_CLOCK_HZ			( ( unsigned portLONG ) F_CPU )
+	//#define configCPU_CLOCK_HZ			( ( unsigned portLONG ) 16000000 )
+
+	#define configTICK_RATE_HZ			( ( portTickType ) 1000 )
+	//##For these bigger cpus, it's possible to define more priorities if necessary:
+	#define configMAX_PRIORITIES		( ( unsigned portBASE_TYPE ) 3 )
+	#define configMINIMAL_STACK_SIZE	( ( unsigned portSHORT ) 85 )
+	//##Run experiments to test this value:
+	#define configTOTAL_HEAP_SIZE		( (size_t ) ( 4096 ) )
+	//#define configMAX_TASK_NAME_LEN		( 8 )
+	#define configMAX_TASK_NAME_LEN		( 16 )
+	#define configUSE_TRACE_FACILITY	0
+	#define configUSE_16_BIT_TICKS		1
+	#define configIDLE_SHOULD_YIELD		0
+	#define configQUEUE_REGISTRY_SIZE	0
+
+	/* Co-routine definitions. */
+	//##2009.10.20: defined as "0":
+	#define configUSE_CO_ROUTINES 		0
+	#define configMAX_CO_ROUTINE_PRIORITIES ( 2 )
+
+	/* Set the following definitions to 1 to include the API function, or zero
+	to exclude the API function. */
+	#define INCLUDE_vTaskPrioritySet		1
+	#define INCLUDE_uxTaskPriorityGet		1
+	//##If the following value is set to 1, change the memory managment scheme to heap_2.c:
+	#define INCLUDE_vTaskDelete				0
+	#define INCLUDE_vTaskCleanUpResources	0
+	#define INCLUDE_vTaskSuspend			1
+	#define INCLUDE_vTaskDelayUntil			1
+	#define INCLUDE_vTaskDelay				1	
 
 #elif defined(__AVR_ATmega328P__)
 	//##Mega328p:
@@ -249,7 +290,8 @@
 	//##For these bigger cpus, it's possible to define more priorities if necessary:
 	#define configMAX_PRIORITIES		( ( unsigned portBASE_TYPE ) 3 )
 	#define configMINIMAL_STACK_SIZE	( ( unsigned portSHORT ) 85 )
-	#define configTOTAL_HEAP_SIZE		( (size_t ) ( 800 ) )
+	//20101220 : decrease heap size from 800 to 500 - see http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1256745982/46#46
+	#define configTOTAL_HEAP_SIZE		( (size_t ) ( 500 ) )
 	//#define configMAX_TASK_NAME_LEN		( 8 )
 	#define configMAX_TASK_NAME_LEN		( 16 )
 	#define configUSE_TRACE_FACILITY	0
