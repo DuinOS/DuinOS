@@ -88,19 +88,15 @@ void analogWrite(uint8_t pin, int val)
 	pinMode(pin, OUTPUT);
 	
 	if (digitalPinToTimer(pin) == TIMER1A) {
-	/* Because DuinOS uses the timer 1 for its kernel, disable this part:  
 		// connect pwm to pin on timer 1, channel A
 		sbi(TCCR1A, COM1A1);
 		// set pwm duty
 		OCR1A = val;
-	*/
 	} else if (digitalPinToTimer(pin) == TIMER1B) {
-	/* Because DuinOS uses the timer 1 for its kernel, disable this part:  
 		// connect pwm to pin on timer 1, channel B
 		sbi(TCCR1A, COM1B1);
 		// set pwm duty
 		OCR1B = val;
-	*/
 #if defined(__AVR_ATmega8__)
 	} else if (digitalPinToTimer(pin) == TIMER2) {
 		// connect pwm to pin on timer 2, channel B
