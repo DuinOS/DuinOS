@@ -41,12 +41,7 @@ volatile unsigned long timer0_overflow_count = 0;
 volatile unsigned long timer0_millis = 0;
 static unsigned char timer0_fract = 0;
 
-// add this part for Timer 0 with Arduino kernel
-#if 0
-  SIGNAL(TIMER0_OVF_vect)
-#else
-  void arduino_increment_millis()
-#endif  
+void arduinoTickHook(void)
 {
 	// copy these to local variables so they can be stored in registers
 	// (volatile variables must be read from memory on every access)
@@ -85,7 +80,14 @@ unsigned long micros() {
 	
 	cli();
 	m = timer0_overflow_count;
+#if defined(TCNT0)
 	t = TCNT0;
+#elif defined(TCNT0L)
+	t = TCNT0L;
+#else
+	#error TIMER 0 not defined
+#endif
+
   
 #ifdef TIFR0
 	if ((TIFR0 & _BV(TOV0)) && (t < 255))
@@ -99,20 +101,6 @@ unsigned long micros() {
 	
 	return ((m << 8) + t) * (64 / clockCyclesPerMicrosecond());
 }
-
-// DuinOS overrides this function with a macro (DuinOS.h)
-/* void delay(unsigned long ms)
-{
-	uint16_t start = (uint16_t)micros();
-
-	while (ms > 0) {
-		if (((uint16_t)micros() - start) >= 1000) {
-			ms--;
-			start += 1000;
-		}
-	}
-}
-*/
 
 /* Delay for the given number of microseconds.  Assumes a 8 or 16 MHz clock. */
 void delayMicroseconds(unsigned int us)
@@ -170,66 +158,67 @@ void init()
 	// work there
 	sei();
 	
-	// on the ATmega168, timer 0 is also used for fast hardware pwm
-	// (using phase-correct PWM would mean that timer 0 overflowed half as often
-	// resulting in different millis() behavior on the ATmega8 and ATmega168)
-#if !defined(__AVR_ATmega8__)
-	sbi(TCCR0A, WGM01);
-	sbi(TCCR0A, WGM00);
-#endif  
-	// set timer 0 prescale factor to 64
-#if defined(__AVR_ATmega8__)
-	sbi(TCCR0, CS01);
-	sbi(TCCR0, CS00);
-#else
-	sbi(TCCR0B, CS01);
-	sbi(TCCR0B, CS00);
-#endif
-	// enable timer 0 overflow interrupt
-#if defined(__AVR_ATmega8__)
-	sbi(TIMSK, TOIE0);
-#else
-	sbi(TIMSK0, TOIE0);
-#endif
-
 	// timers 1 and 2 are used for phase-correct hardware pwm
 	// this is better for motors as it ensures an even waveform
 	// note, however, that fast pwm mode can achieve a frequency of up
 	// 8 MHz (with a 16 MHz clock) at 50% duty cycle
-        
+#if defined(TCCR1B) && defined(CS11) && defined(CS10)
 	TCCR1B = 0;
 
 	// set timer 1 prescale factor to 64
 	sbi(TCCR1B, CS11);
+#if F_CPU >= 8000000L
 	sbi(TCCR1B, CS10);
+#endif
+#elif defined(TCCR1) && defined(CS11) && defined(CS10)
+	sbi(TCCR1, CS11);
+#if F_CPU >= 8000000L
+	sbi(TCCR1, CS10);
+#endif
+#endif
 	// put timer 1 in 8-bit phase correct pwm mode
+#if defined(TCCR1A) && defined(WGM10)
 	sbi(TCCR1A, WGM10);
-	
-
+#elif defined(TCCR1)
+	#warning this needs to be finished
+#endif
 	// set timer 2 prescale factor to 64
-#if defined(__AVR_ATmega8__)
+#if defined(TCCR2) && defined(CS22)
 	sbi(TCCR2, CS22);
-#else
+#elif defined(TCCR2B) && defined(CS22)
 	sbi(TCCR2B, CS22);
-#endif
-	// configure timer 2 for phase correct pwm (8-bit)
-#if defined(__AVR_ATmega8__)
-	sbi(TCCR2, WGM20);
 #else
+	#warning Timer 2 not finished (may not be present on this CPU)
+#endif
+
+	// configure timer 2 for phase correct pwm (8-bit)
+#if defined(TCCR2) && defined(WGM20)
+	sbi(TCCR2, WGM20);
+#elif defined(TCCR2A) && defined(WGM20)
 	sbi(TCCR2A, WGM20);
+#else
+	#warning Timer 2 not finished (may not be present on this CPU)
 #endif
 
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-	// set timer 3, 4, 5 prescale factor to 64
-	sbi(TCCR3B, CS31);	sbi(TCCR3B, CS30);
-	sbi(TCCR4B, CS41);	sbi(TCCR4B, CS40);
-	sbi(TCCR5B, CS51);	sbi(TCCR5B, CS50);
-	// put timer 3, 4, 5 in 8-bit phase correct pwm mode
-	sbi(TCCR3A, WGM30);
-	sbi(TCCR4A, WGM40);
-	sbi(TCCR5A, WGM50);
+#if defined(TCCR3B) && defined(CS31) && defined(WGM30)
+	sbi(TCCR3B, CS31);		// set timer 3 prescale factor to 64
+	sbi(TCCR3B, CS30);
+	sbi(TCCR3A, WGM30);		// put timer 3 in 8-bit phase correct pwm mode
+#endif
+	
+#if defined(TCCR4B) && defined(CS41) && defined(WGM40)
+	sbi(TCCR4B, CS41);		// set timer 4 prescale factor to 64
+	sbi(TCCR4B, CS40);
+	sbi(TCCR4A, WGM40);		// put timer 4 in 8-bit phase correct pwm mode
 #endif
 
+#if defined(TCCR5B) && defined(CS51) && defined(WGM50)
+	sbi(TCCR5B, CS51);		// set timer 5 prescale factor to 64
+	sbi(TCCR5B, CS50);
+	sbi(TCCR5A, WGM50);		// put timer 5 in 8-bit phase correct pwm mode
+#endif
+
+#if defined(ADCSRA)
 	// set a2d prescale factor to 128
 	// 16 MHz / 128 = 125 KHz, inside the desired 50-200 KHz range.
 	// XXX: this will not work properly for other clock speeds, and
@@ -240,13 +229,14 @@ void init()
 
 	// enable a2d conversions
 	sbi(ADCSRA, ADEN);
+#endif
 
 	// the bootloader connects pins 0 and 1 to the USART; disconnect them
 	// here so they can be used as normal digital i/o; they will be
 	// reconnected in Serial.begin()
-#if defined(__AVR_ATmega8__)
+#if defined(UCSRB)
 	UCSRB = 0;
-#else
+#elif defined(UCSR0B)
 	UCSR0B = 0;
 #endif
 }

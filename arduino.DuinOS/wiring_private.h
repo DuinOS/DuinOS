@@ -27,11 +27,10 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <avr/delay.h>
 #include <stdio.h>
 #include <stdarg.h>
 
-#include "wiring.h"
+#include "Arduino.h"
 
 #ifdef __cplusplus
 extern "C"{

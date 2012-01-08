@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V6.1.0 - Copyright (C) 2010 Real Time Engineers Ltd.
+    FreeRTOS V6.1.1 - Copyright (C) 2011 Real Time Engineers Ltd.
 
     ***************************************************************************
     *                                                                         *
@@ -53,19 +53,6 @@
 
 /* 
 
-Changes from FreeRTOS 5.4.2
-
-	+ AVR port - Adapted ATmega323 port to the AT90USB USB AVRs
-	
-FreeRTOS developper team rename variables from portCHAR to char, portLONG to long, portSHORT to short.
-But (I think) we need to keep port* variables because there are used in the file FreeRTOSConfig.h that add support for 
-Atmel AVR ATmega644, ATmega644P, ATmega1284P, AVR_ATmega1280, AVR_ATmega328P, ATmega88, ATmega88P, ATmega168, ATmega168P
-You can find information about adding support for Atmel AVR chips in Arduino Card in FreeRTOS here :
-http://www.avrfreaks.net/index.php?name=PNphpBB2&file=viewtopic&p=574737&sid=0d73d27555a0fd91faca37b6beee924e#574737
-
-
-/* 
-
 Changes from V2.6.0
 
 	+ AVR port - Replaced the inb() and outb() functions with direct memory
@@ -78,6 +65,7 @@ Changes from V2.6.0
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "wiring_private.h"
 
 /*-----------------------------------------------------------
  * Implementation of functions defined in portable.h for the AVR port.
@@ -87,15 +75,9 @@ Changes from V2.6.0
 #define portFLAGS_INT_ENABLED					( ( portSTACK_TYPE ) 0x80 )
 
 /* Hardware constants for timer 1. */
-/* Disable hardware constants for Atmel AVR ATmega323
-#define portCLEAR_COUNTER_ON_MATCH				( ( unsigned char ) 0x08 )
-#define portPRESCALE_64							( ( unsigned char ) 0x03 )
-#define portCLOCK_PRESCALER						( ( unsigned long ) 64 )
-#define portCOMPARE_MATCH_A_INTERRUPT_ENABLE	( ( unsigned char ) 0x10 )
-/*
 /* Enable hardware constants for Atmel AVR ATmega644, ATmega644P, ATmega1284P, AVR_ATmega1280, AVR_ATmega328P, ATmega88, ATmega88P, ATmega168, ATmega168P */
-#define portCLEAR_COUNTER_ON_MATCH				( (unsigned portCHAR)(1 << WGM12) ) /* remove portCLEAR_COUNTER_ON_MATCH because it is not used in timer ? */
-#define portCLOCK_PRESCALER					( (unsigned portLONG) 64 )
+#define portCLEAR_COUNTER_ON_MATCH                             ( (unsigned portCHAR)(1 << WGM12) ) /* remove portCLEAR_COUNTER_ON_MATCH because it is not used in timer ? */
+#define portCLOCK_PRESCALER                                    ( (unsigned portLONG) 64 )
 
 /*-----------------------------------------------------------*/
 
@@ -228,9 +210,7 @@ static void prvSetupTimerInterrupt( void );
  */
 portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE pxCode, void *pvParameters )
 {
-/* Disable this part for Atmel AVR ATmega323
-   unsigned short usAddress; */
-   unsigned portSHORT usAddress;
+unsigned portSHORT usAddress;
 
 	/* Place a few bytes of known values on the bottom of the stack. 
 	This is just useful for debugging. */
@@ -249,16 +229,11 @@ portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE
 
 	/* The start of the task code will be popped off the stack last, so place
 	it on first. */
-	/* Disable this part for Atmel AVR ATmega323
-	usAddress = ( unsigned short ) pxCode;
-	*pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned short ) 0x00ff ); */
 	usAddress = ( unsigned portSHORT ) pxCode;
 	*pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portSHORT ) 0x00ff );
 	pxTopOfStack--;
 
 	usAddress >>= 8;
-	/* Disable this part for Atmel AVR ATmega323
-	*pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned short ) 0x00ff ); */
 	*pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portSHORT ) 0x00ff );
 	pxTopOfStack--;
 
@@ -321,16 +296,11 @@ portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE
 	pxTopOfStack--;
 
 	/* Place the parameter on the stack in the expected location. */
-	/* Disable this part for Atmel AVR ATmega323
-	usAddress = ( unsigned short ) pvParameters;
-	*pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned short ) 0x00ff ); */
 	usAddress = ( unsigned portSHORT ) pvParameters;
 	*pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portSHORT ) 0x00ff );
 	pxTopOfStack--;
 
 	usAddress >>= 8;
-	/* Disable this part for Atmel AVR ATmega323
-	*pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned short ) 0x00ff ); */
 	*pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portSHORT ) 0x00ff );
 	pxTopOfStack--;
 
@@ -402,8 +372,6 @@ void vPortYieldFromTick( void ) __attribute__ ( ( naked ) );
 void vPortYieldFromTick( void )
 {
 	portSAVE_CONTEXT();
-	/* add the new function arduino_increment_millis() for Timer in Arduino kernel */
-	arduino_increment_millis();
 	vTaskIncrementTick();
 	vTaskSwitchContext();
 	portRESTORE_CONTEXT();
@@ -417,128 +385,76 @@ void vPortYieldFromTick( void )
  */
 static void prvSetupTimerInterrupt( void )
 {
-/* Disable this part for Atmel AVR ATmega323  
-unsigned long ulCompareMatch;
-unsigned char ucHighByte, ucLowByte; */
-unsigned portLONG ulCompareMatch;
+	// on the ATmega168, timer 0 is also used for fast hardware pwm
+	// (using phase-correct PWM would mean that timer 0 overflowed half as often
+	// resulting in different millis() behavior on the ATmega8 and ATmega168)
+#if defined(TCCR0A) && defined(WGM01)
+	sbi(TCCR0A, WGM01);
+	sbi(TCCR0A, WGM00);
+#endif  
 
-// timer 0 will be used in Arduino, and it's setup by the Arduino lib
-#ifndef FREERTOS_ARDUINO
-		
-	/* Using 16bit timer 1 to generate the tick.  Correct fuses must be
-	selected for the configCPU_CLOCK_HZ clock. */
-	ulCompareMatch = configCPU_CLOCK_HZ / configTICK_RATE_HZ;
+	// set timer 0 prescale factor to 64
+#if defined(__AVR_ATmega128__)
+	// CPU specific: different values for the ATmega128
+	sbi(TCCR0, CS02);
+#elif defined(TCCR0) && defined(CS01) && defined(CS00)
+	// this combination is for the standard atmega8
+	sbi(TCCR0, CS01);
+	sbi(TCCR0, CS00);
+#elif defined(TCCR0B) && defined(CS01) && defined(CS00)
+	// this combination is for the standard 168/328/1280/2560
+	sbi(TCCR0B, CS01);
+	sbi(TCCR0B, CS00);
+#elif defined(TCCR0A) && defined(CS01) && defined(CS00)
+	// this combination is for the __AVR_ATmega645__ series
+	sbi(TCCR0A, CS01);
+	sbi(TCCR0A, CS00);
+#else
+	#error Timer 0 prescale factor 64 not set correctly
+#endif
 
-	/* We only have 16 bits so have to scale to get our required tick rate. */
-	ulCompareMatch /= portCLOCK_PRESCALER;
-
-	/* Adjust for correct value. */
-	/* Disable this part for Atmel AVR ATmega323  
-	ulCompareMatch -= ( unsigned long ) 1; */
-	ulCompareMatch -= ( unsigned portLONG ) 1;
-
-	/* Setup compare match value for compare match A.  Interrupts are disabled 
-	before this is called so we need not worry here. */
-	/* Disable this part for Atmel AVR ATmega323  
-	ucLowByte = ( unsigned char ) ( ulCompareMatch & ( unsigned long ) 0xff );
-	ulCompareMatch >>= 8;
-	ucHighByte = ( unsigned char ) ( ulCompareMatch & ( unsigned long ) 0xff );
-	OCR1AH = ucHighByte;
-	OCR1AL = ucLowByte; */
-	OCR1A = ulCompareMatch;
-
-	/* Setup clock source and compare match behaviour. */
-	/* Disable this part  for Atmel AVR ATmega323  
-	ucLowByte = portCLEAR_COUNTER_ON_MATCH | portPRESCALE_64;
-	TCCR1B = ucLowByte; */
-	TCCR1A = 0;
-	// CS10 and CS11 will set a prescale value of 64
-	TCCR1B = ((1 << CS10) | (1 << CS11) | (1 << WGM12));
-
-	/* Enable the interrupt - this is okay as interrupt are currently globally
-	disabled. */
-	/* Disable this part for Atmel AVR ATmega323  
-	ucLowByte = TIMSK;
-	ucLowByte |= portCOMPARE_MATCH_A_INTERRUPT_ENABLE;
-	TIMSK = ucLowByte; */
-	TIMSK1 = (1 << OCIE1A);
+	// enable timer 0 overflow interrupt
+#if defined(TIMSK) && defined(TOIE0)
+	sbi(TIMSK, TOIE0);
+#elif defined(TIMSK0) && defined(TOIE0)
+	sbi(TIMSK0, TOIE0);
+#else
+	#error	Timer 0 overflow interrupt not set correctly
 #endif
 }
 /*-----------------------------------------------------------*/
 
-#ifdef FREERTOS_ARDUINO
-    void arduino_increment_millis();
-   
-  #if configUSE_PREEMPTION == 1
+#if configUSE_PREEMPTION == 1
 
 	/*
 	 * Tick ISR for preemptive scheduler.  We can use a naked attribute as
 	 * the context is saved at the start of vPortYieldFromTick().  The tick
 	 * count is incremented after the context is saved.
 	 */
-	/* Disable this part for Atmel AVR ATmega323 and replace by the line ISR(TIMER0_OVF_vect, ISR_NAKED) 
-	void SIG_OUTPUT_COMPARE1A( void ) __attribute__ ( ( signal, naked ) );
-	void SIG_OUTPUT_COMPARE1A( void ) */
-	
-	ISR(TIMER0_OVF_vect, ISR_NAKED)
+	#if defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
+	ISR(TIM0_OVF_vect)
+	#else
+	ISR(TIMER0_OVF_vect)
+	#endif
 	{
 		vPortYieldFromTick();
-		asm volatile ( "reti" );
 	}
-  #else
-
-	/*
-	 * Tick ISR for the cooperative scheduler.  All this does is increment the
-	 * tick count.  We don't need to switch context, this can only be done by
-	 * manual calls to taskYIELD();
-	 */
-	/* Disable this part for Atmel AVR ATmega323 and replace by TIMER0_OVF_vect 
-	void SIG_OUTPUT_COMPARE1A( void ) __attribute__ ( ( signal ) );
-	void SIG_OUTPUT_COMPARE1A( void ) */
-	
-  	void TIMER0_OVF_vect( void ) __attribute__ ( ( signal ) );
-  	void TIMER0_OVF_vect( void )
-	{
-		/* add the new function arduino_increment_millis() for Timer in Arduino kernel */
-		arduino_increment_millis();
-		vTaskIncrementTick();
-	}
-  #endif
 #else
-  #if configUSE_PREEMPTION == 1
-
-	/*
-	 * Tick ISR for preemptive scheduler.  We can use a naked attribute as
-	 * the context is saved at the start of vPortYieldFromTick().  The tick
-	 * count is incremented after the context is saved.
-	 */
-	/* Disable this part for Atmel AVR ATmega323 and replace by the line ISR(TIMER1_OVF_vect, ISR_NAKED)
-	void SIG_OUTPUT_COMPARE1A( void ) __attribute__ ( ( signal, naked ) );
-	void SIG_OUTPUT_COMPARE1A( void ) */
-	
-	ISR(TIMER1_OVF_vect, ISR_NAKED)
-	{
-		vPortYieldFromTick();
-		asm volatile ( "reti" );
-	}
-  #else
 
 	/*
 	 * Tick ISR for the cooperative scheduler.  All this does is increment the
 	 * tick count.  We don't need to switch context, this can only be done by
 	 * manual calls to taskYIELD();
 	 */
-	/* Disable this part for Atmel AVR ATmega323 and replace by TIMER1_OVF_vect 
-	void SIG_OUTPUT_COMPARE1A( void ) __attribute__ ( ( signal ) );
-	void SIG_OUTPUT_COMPARE1A( void ) */
-	
-	ISR(TIMER1_OVF_vect, ISR_NAKED)
+	#if defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
+	SIGNAL(TIM0_OVF_vect)
+	#else
+	SIGNAL(TIMER0_OVF_vect)
+	#endif
 	{
-		/* add the new function arduino_increment_millis() for Timer in Arduino kernel */
-		arduino_increment_millis();
 		vTaskIncrementTick();
 	}
-  #endif
 #endif
+
 
 	

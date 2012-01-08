@@ -1,5 +1,5 @@
 ********************************
- DuinOS v0.3 Alpha
+ DuinOS v0.4 Alpha
 ********************************
 
 Copyright (C) 2009 Multiplo
@@ -106,4 +106,10 @@ MATERIALS ON THIS WEBSITE.
   ServoTimer2 lib website : http://code.google.com/p/tricopter/source/browse/trunk/arduino/#arduino%2Flibraries%2FServoTimer2
   Need testing
  
+* 0.4.0 Alpha / 2012.01.08 (Eric Dillmann <eric.dillmann@nospam@gmail.com>)
+- Arduino IDE updated to version 1.0
+- FreeRTOS updated to 7.1.0
+- Use Timer0 for FreeRTOS
+- Remove Servo library (standard one should work)
+* 0.
  
