@@ -1,21 +1,21 @@
-How to create a new DuinOS release by updating FreeRTOS and Arduino IDE parts.
+Como criar um novo release do DuinOS atualizando das partes do FreeRTOS e Arduino IDE.
 
-Tested by upgrading DuinOS 0.2 to DuinOS 0.3 with
-* upgrade Arduino IDE from 0018 to 0021
-* upgrade FreeRTOS 6.0.5 to 6.1.0
+Testado no upgrade do DuinOS 0.4 para o DuinOS 0.6.1
+* Upgrade Arduino IDE para 1.5
+* Upgrade FreeRTOS 7.3.0 (HEAD GIT em 29/10/2012)
 
-1) Create the DuinOS_v0.X folder where is a number that is one step upper than the latest DuinOS release available.
+1) Criei um novo Branch Chamado "DuinOS_V0.6.1"
 
-2) Create the DuinOS_v0.X/arduino.DuinOS/DuinOS folder where there are all the files from FreeRTOS.
-Now, you need to copy the following files in the folder that you have created :
+2) Criei uma pasta chamada arduino.DuinOS.AVR/DuinOS onde estão todos os arquivos do FreeRTOS,
+você precisa copiar os seguintes arquivos para a pasta.
 
-a) from FreeRTOSVx.x.x/Source/
+a) do FreeRTOSVx.x.x/Source/
 croutine.c
 list.c
 queue.c
 tasks.c
 
-b) from FreeRTOSVx.x.x/Source/include/
+b) do FreeRTOSVx.x.x/Source/include/
 croutine.h
 FreeRTOS.h
 list.h
@@ -27,648 +27,63 @@ semphr.h
 StackMacros.h
 task.h
 
-c) from FreeRTOSVx.x.x/Source/portable/MemMang/
+c) do FreeRTOSVx.x.x/Source/portable/MemMang/
 heap_1.c
 heap_2.c
 heap_3.c
 
-c) from FreeRTOSVx.x.x/Source/portable/GCC/ATMega323/ 
+c) do FreeRTOSVx.x.x/Source/portable/GCC/ATMega323/ 
 port.c
 portmacro.h
-port.c (file updated to add support for Atmel AtMega chips
+port.c (arquivo atualizado para dar suporte aos chips Atmel AtMega
 
-3) Now you need to patch DuinOS_v0.X/arduino.DuinOS/DuinOS/port.c with the following patch :
+3) agora é preciso aplicar o patch ao arquivo arduino.DuinOS.AVR/DuinOS/port.c 
+   como apresentado no arquivo port.c.path
 
---- port.c.ORI  2010-09-23 16:44:44.000000000 +0200
-+++ port.c      2010-12-18 17:01:34.000000000 +0100
-@@ -53,6 +53,19 @@
- 
- /* 
- 
-+Changes from FreeRTOS 5.4.2
-+
-+       + AVR port - Adapted ATmega323 port to the AT90USB USB AVRs
-+
-+FreeRTOS developper team rename variables from portCHAR to char, portLONG to long, portSHORT to short.
-+But (I think) we need to keep port* variables because there are used in the file FreeRTOSConfig.h that add support for 
-+Atmel AVR ATmega644, ATmega644P, ATmega1284P, AVR_ATmega1280, AVR_ATmega328P, ATmega88, ATmega88P, ATmega168, ATmega168P
-+You can find information about adding support for Atmel AVR chips in Arduino Card in FreeRTOS here :
-+http://www.avrfreaks.net/index.php?name=PNphpBB2&file=viewtopic&p=574737&sid=0d73d27555a0fd91faca37b6beee924e#574737
-+
-+
-+/* 
-+
- Changes from V2.6.0
- 
-        + AVR port - Replaced the inb() and outb() functions with direct memory
-@@ -74,10 +87,15 @@
- #define portFLAGS_INT_ENABLED                                  ( ( portSTACK_TYPE ) 0x80 )
- 
- /* Hardware constants for timer 1. */
-+/* Disable hardware constants for Atmel AVR ATmega323
- #define portCLEAR_COUNTER_ON_MATCH                             ( ( unsigned char ) 0x08 )
- #define portPRESCALE_64                                                        ( ( unsigned char ) 0x03 )
- #define portCLOCK_PRESCALER                                            ( ( unsigned long ) 64 )
- #define portCOMPARE_MATCH_A_INTERRUPT_ENABLE   ( ( unsigned char ) 0x10 )
-+/*
-+/* Enable hardware constants for Atmel AVR ATmega644, ATmega644P, ATmega1284P, AVR_ATmega1280, AVR_ATmega328P, ATmega88, ATmega88P, ATmega168, ATmega168P */
-+#define portCLEAR_COUNTER_ON_MATCH                             ( (unsigned portCHAR)(1 << WGM12) ) /* remove portCLEAR_COUNTER_ON_MATCH because it is not used in timer ? */
-+#define portCLOCK_PRESCALER                                    ( (unsigned portLONG) 64 )
- 
- /*-----------------------------------------------------------*/
- 
-@@ -210,7 +228,9 @@
-  */
- portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE pxCode, void *pvParameters )
- {
--unsigned short usAddress;
-+/* Disable for Atmel AVR ATmega323
-+   unsigned short usAddress; */
-+   unsigned portSHORT usAddress;
- 
-        /* Place a few bytes of known values on the bottom of the stack. 
-        This is just useful for debugging. */
-@@ -229,12 +249,17 @@
- 
-        /* The start of the task code will be popped off the stack last, so place
-        it on first. */
-+       /* Disable for Atmel AVR ATmega323
-        usAddress = ( unsigned short ) pxCode;
--       *pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned short ) 0x00ff );
-+       *pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned short ) 0x00ff ); */
-+       usAddress = ( unsigned portSHORT ) pxCode;
-+       *pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portSHORT ) 0x00ff );
-        pxTopOfStack--;
- 
-        usAddress >>= 8;
--       *pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned short ) 0x00ff );
-+       /* Disable for Atmel AVR ATmega323
-+       *pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned short ) 0x00ff ); */
-+       *pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portSHORT ) 0x00ff );
-        pxTopOfStack--;
- 
-        /* Next simulate the stack as if after a call to portSAVE_CONTEXT().  
-@@ -296,12 +321,17 @@
-        pxTopOfStack--;
- 
-        /* Place the parameter on the stack in the expected location. */
-+       /* Disable for Atmel AVR ATmega323
-        usAddress = ( unsigned short ) pvParameters;
--       *pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned short ) 0x00ff );
-+       *pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned short ) 0x00ff ); */
-+       usAddress = ( unsigned portSHORT ) pvParameters;
-+       *pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portSHORT ) 0x00ff );
-        pxTopOfStack--;
- 
-        usAddress >>= 8;
--       *pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned short ) 0x00ff );
-+       /* Disable for Atmel AVR ATmega323
-+       *pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned short ) 0x00ff ); */
-+       *pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portSHORT ) 0x00ff );
-        pxTopOfStack--;
- 
-        *pxTopOfStack = ( portSTACK_TYPE ) 0x26;        /* R26 X */
-@@ -385,8 +415,11 @@
-  */
- static void prvSetupTimerInterrupt( void )
- {
-+/* Disable for Atmel AVR ATmega323  
- unsigned long ulCompareMatch;
--unsigned char ucHighByte, ucLowByte;
-+unsigned char ucHighByte, ucLowByte; */
-+unsigned portLONG ulCompareMatch;
-+
- 
-        /* Using 16bit timer 1 to generate the tick.  Correct fuses must be
-        selected for the configCPU_CLOCK_HZ clock. */
-@@ -397,25 +430,35 @@
-        ulCompareMatch /= portCLOCK_PRESCALER;
- 
-        /* Adjust for correct value. */
--       ulCompareMatch -= ( unsigned long ) 1;
-+       /* Disable for Atmel AVR ATmega323  
-+       ulCompareMatch -= ( unsigned long ) 1; */
-+       ulCompareMatch -= ( unsigned portLONG ) 1;
- 
-        /* Setup compare match value for compare match A.  Interrupts are disabled 
-        before this is called so we need not worry here. */
-+       /* Disable for Atmel AVR ATmega323  
-        ucLowByte = ( unsigned char ) ( ulCompareMatch & ( unsigned long ) 0xff );
-        ulCompareMatch >>= 8;
-        ucHighByte = ( unsigned char ) ( ulCompareMatch & ( unsigned long ) 0xff );
-        OCR1AH = ucHighByte;
--       OCR1AL = ucLowByte;
-+       OCR1AL = ucLowByte; */
-+       OCR1A = ulCompareMatch;
- 
-        /* Setup clock source and compare match behaviour. */
-+       /* Disable for Atmel AVR ATmega323  
-        ucLowByte = portCLEAR_COUNTER_ON_MATCH | portPRESCALE_64;
--       TCCR1B = ucLowByte;
-+       TCCR1B = ucLowByte; */
-+       TCCR1A = 0;
-+       // CS10 and CS11 will set a prescale value of 64
-+       TCCR1B = ((1 << CS10) | (1 << CS11) | (1 << WGM12));
- 
-        /* Enable the interrupt - this is okay as interrupt are currently globally
-        disabled. */
-+       /* Disable for Atmel AVR ATmega323  
-        ucLowByte = TIMSK;
-        ucLowByte |= portCOMPARE_MATCH_A_INTERRUPT_ENABLE;
--       TIMSK = ucLowByte;
-+       TIMSK = ucLowByte; */
-+       TIMSK1 = (1 << OCIE1A);
- }
- /*-----------------------------------------------------------*/
- 
-@@ -426,8 +469,11 @@
-         * the context is saved at the start of vPortYieldFromTick().  The tick
-         * count is incremented after the context is saved.
-         */
-+       /* Disable for Atmel AVR ATmega323  
-        void SIG_OUTPUT_COMPARE1A( void ) __attribute__ ( ( signal, naked ) );
--       void SIG_OUTPUT_COMPARE1A( void )
-+       void SIG_OUTPUT_COMPARE1A( void ) */
-+       void TIMER1_COMPA_vect( void ) __attribute__ ( ( signal, naked ) );
-+       void TIMER1_COMPA_vect( void )
-        {
-                vPortYieldFromTick();
-                asm volatile ( "reti" );
-@@ -439,8 +485,11 @@
-         * tick count.  We don't need to switch context, this can only be done by
-         * manual calls to taskYIELD();
-         */
-+       /* Disable for Atmel AVR ATmega323  
-        void SIG_OUTPUT_COMPARE1A( void ) __attribute__ ( ( signal ) );
--       void SIG_OUTPUT_COMPARE1A( void )
-+       void SIG_OUTPUT_COMPARE1A( void ) */
-+       void TIMER1_COMPA_vect( void ) __attribute__ ( ( signal ) );
-+       void TIMER1_COMPA_vect( void )
-        {
-                vTaskIncrementTick();
-        }
+4) No diretorio arduino.DuinOS.AVR, você precisa copiar todos os arquivos
+   para o diretorio arduino-00xx/hardware/arduino/avr/cores/arduino:
 
+5) aplicar os respectivos patch nos seguintes arquivos:
 
+* Arduino.h / Adicionar a carga do cabeçalho DuinOS.h, remover a definição
+  da função delay(), esta será definida como macro no arquivo DuinOS.h
+* wiring.c / desabilitar a função delay porque o DuinOS sobrescreve com um
+  macro definida no arquivo DuinOS.h 
+  desabilitar a configuração do timer1 porque o DuinOS sobreescreve esta função
+  com uma macro definda no arquivo DuinOS.h
+* wiring_analog.c / Já que o DuinOS usa o timer 1 para este kernel, desabilita
+  TIMER1A e TIMER1B
 
-4) In the DuinOS_v0.X/arduino.DuinOS folder, you need to copy the following files  :
-
-a) from arduino-00xx/hardware/arduino/cores/arduino/ (with no changes)
-
-binary.h
-HardwareSerial.cpp
-HardwareSerial.h
-pins_arduino.c
-pins_arduino.h
-Print.cpp
-Print.h
-Stream.h
-Tone.cpp
-WConstants.h
-wiring_digital.c
-wiring_private.h
-wiring_pulse.c
-wiring_shift.c
-WInterrupts.c
-WMath.cpp
-WString.cpp
-WString.h
-
-5) Patch the following files from arduino-00xx/hardware/arduino/cores/arduino/ and copy them in DuinOS_v0.X/arduino.DuinOS folder
-
-* wiring.c / disable delay function because DuinOS overrides this function with a macro (DuinOS.h) / 
-disable timer1 configuration because DuinOS overrides this function with a macro (DuinOS.h)
-* wiring_analog.c / Because DuinOS uses the timer 1 for its kernel, disable TIMER1A and TIMER1B
-* main.cpp  / add loading DuinOS.h and several functions
-* wiring.h / add conditional load for delay function
-* WProgram.h / add loading DuinOS.h
-
-Patchs :
-
---- wiring_analog.c.ORI 2010-10-02 22:17:42.000000000 +0200
-+++ wiring_analog.c     2010-12-18 18:05:06.000000000 +0100
-@@ -88,15 +88,19 @@
-        pinMode(pin, OUTPUT);
- 
-        if (digitalPinToTimer(pin) == TIMER1A) {
-+       /* Because DuinOS uses the timer 1 for its kernel, disable this part:  
-                // connect pwm to pin on timer 1, channel A
-                sbi(TCCR1A, COM1A1);
-                // set pwm duty
-                OCR1A = val;
-+       */
-        } else if (digitalPinToTimer(pin) == TIMER1B) {
-+       /* Because DuinOS uses the timer 1 for its kernel, disable this part:  
-                // connect pwm to pin on timer 1, channel B
-                sbi(TCCR1A, COM1B1);
-                // set pwm duty
-                OCR1B = val;
-+       */
- #if defined(__AVR_ATmega8__)
-        } else if (digitalPinToTimer(pin) == TIMER2) {
-                // connect pwm to pin on timer 2, channel B
-
-
-
---- wiring.c.ORI        2010-10-02 22:17:42.000000000 +0200                                                                                                                                                        
-+++ wiring.c    2010-12-18 18:21:13.000000000 +0100                                                                                                                                                                
-@@ -95,7 +95,8 @@                                                                                                                                                                                                  
-        return ((m << 8) + t) * (64 / clockCyclesPerMicrosecond());
- }
- 
--void delay(unsigned long ms)
-+// DuinOS overrides this function with a macro (DuinOS.h)
-+/* void delay(unsigned long ms)
- {
-        uint16_t start = (uint16_t)micros();
- 
-@@ -106,6 +107,7 @@
-                }
-        }
- }
-+*/
- 
- /* Delay for the given number of microseconds.  Assumes a 8 or 16 MHz clock. */
- void delayMicroseconds(unsigned int us)
-@@ -190,13 +192,16 @@
-        // note, however, that fast pwm mode can achieve a frequency of up
-        // 8 MHz (with a 16 MHz clock) at 50% duty cycle
-         
--        TCCR1B = 0;
-+        // DuinOS: This commented code is the only difference with the standard init() function
-+       // (DuinOS uses the timer 1 for the preemptive kernel):
-+       /* TCCR1B = 0;
- 
-        // set timer 1 prescale factor to 64
-        sbi(TCCR1B, CS11);
-        sbi(TCCR1B, CS10);
-        // put timer 1 in 8-bit phase correct pwm mode
--       sbi(TCCR1A, WGM10);
-+       sbi(TCCR1A, WGM10); */
-+
- 
-        // set timer 2 prescale factor to 64
- #if defined(__AVR_ATmega8__)
-
-
-
---- wiring.h.ORI        2010-10-02 22:17:42.000000000 +0200
-+++ wiring.h    2010-12-18 18:40:18.000000000 +0100
-@@ -114,7 +114,12 @@
- 
- unsigned long millis(void);
- unsigned long micros(void);
-+
-+#ifndef DuinOS__h
-+// DuinOS overrides this:
- void delay(unsigned long);
-+#endif
-+
- void delayMicroseconds(unsigned int us);
- unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout);
-
-
---- WProgram.h.ORI      2010-10-02 22:17:42.000000000 +0200
-+++ WProgram.h  2010-12-18 18:46:07.000000000 +0100
-@@ -9,6 +9,9 @@
- 
- #include "wiring.h"
- 
-+// DuinOS is include here, because it's part of the core:
-+#include "DuinOS.h"
-+
- #ifdef __cplusplus
- #include "WString.h"
- #include "HardwareSerial.h"
-
-
---- main.cpp.ORI        2010-10-02 22:17:42.000000000 +0200
-+++ main.cpp    2010-12-18 18:53:06.000000000 +0100
-@@ -1,14 +1,29 @@
--#include <WProgram.h>
--
--int main(void)
--{
--       init();
--
--       setup();
--    
--       for (;;)
--               loop();
--        
--       return 0;
--}
--
-+#include <WProgram.h>
-+// add DuinOS support
-+#include "DuinOS.h"
-+
-+unsigned portBASE_TYPE mainLoopPriority;
-+
-+void main_Task(void *pvParameters)
-+{
-+       for(;;)
-+               loop();
-+}
-+
-+
-+int main(void)
-+{
-+       //This is made prior to setup(), so this priority could be changed in setup():
-+       mainLoopPriority = LOW_PRIORITY;
-+
-+       init();
-+       setup();
-+
-+       xTaskCreate(main_Task, (signed portCHAR *) "main", configMINIMAL_STACK_SIZE, NULL, mainLoopPriority, NULL);
-+       vTaskStartScheduler();
-+
-+       //Will not get here unless a task calls vTaskEndScheduler():
-+       for (;;);
-+
-+       return 0;
-+}
-
-
-6) Get the following files in a previous DuinOS release :
+6) Obter os seguintes arquivos de um release anterior do DuinOS:
 DuinOS.h 
 FreeRTOSConfig.h
-and copy them in DuinOS_v0.X/arduino.DuinOS folder.
+e copiar na pasta arduino.DuinOS.AVR.
 
-7) Copy the folder DuinOS_v0.x/examples/ from a previous release to the new DuinOS release in DuinOS_v0.x/examples/
+7) Copiar a pasta  examples/ de um release anterior para o no branch
+   mantendo o nome
 
-8) Copy arduino-00xx/hardware/arduino/board.txt in DuinOS_v0.x/hardware folder and patch it with the following patch :
-
---- boards.txt.ORI      2010-10-02 22:17:42.000000000 +0200
-+++ boards.txt  2010-12-18 19:23:23.000000000 +0100
-@@ -37,6 +37,26 @@
- 
- ##############################################################
- 
-+atmega328_DuinOS.name=Arduino Duemilanove or Nano w/ ATmega328 + DuinOS
-+
-+atmega328_DuinOS.upload.protocol=stk500
-+atmega328_DuinOS.upload.maximum_size=30720
-+atmega328_DuinOS.upload.speed=57600
-+
-+atmega328_DuinOS.bootloader.low_fuses=0xFF
-+atmega328_DuinOS.bootloader.high_fuses=0xDA
-+atmega328_DuinOS.bootloader.extended_fuses=0x05
-+atmega328_DuinOS.bootloader.path=atmega
-+atmega328_DuinOS.bootloader.file=ATmegaBOOT_168_atmega328.hex
-+atmega328_DuinOS.bootloader.unlock_bits=0x3F
-+atmega328_DuinOS.bootloader.lock_bits=0x0F
-+
-+atmega328_DuinOS.build.mcu=atmega328p
-+atmega328_DuinOS.build.f_cpu=16000000L
-+atmega328_DuinOS.build.core=arduino.DuinOS
-+
-+##############################################################
-+
- diecimila.name=Arduino Diecimila, Duemilanove, or Nano w/ ATmega168
- 
- diecimila.upload.protocol=stk500
-@@ -57,6 +77,26 @@
- 
- ##############################################################
- 
-+diecimila_DuinOS.name=Arduino Diecimila, Duemilanove, or Nano w/ ATmega168 + DuinOS
-+
-+diecimila_DuinOS.upload.protocol=stk500
-+diecimila_DuinOS.upload.maximum_size=14336
-+diecimila_DuinOS.upload.speed=19200
-+
-+diecimila_DuinOS.bootloader.low_fuses=0xff
-+diecimila_DuinOS.bootloader.high_fuses=0xdd
-+diecimila_DuinOS.bootloader.extended_fuses=0x00
-+diecimila_DuinOS.bootloader.path=atmega
-+diecimila_DuinOS.bootloader.file=ATmegaBOOT_168_diecimila.hex
-+diecimila_DuinOS.bootloader.unlock_bits=0x3F
-+diecimila_DuinOS.bootloader.lock_bits=0x0F
-+
-+diecimila_DuinOS.build.mcu=atmega168
-+diecimila_DuinOS.build.f_cpu=16000000L
-+diecimila_DuinOS.build.core=arduino.DuinOS
-+
-+##############################################################
-+
- mega2560.name=Arduino Mega 2560
- 
- mega2560.upload.protocol=stk500v2
-@@ -97,6 +137,26 @@
- 
- ##############################################################
- 
-+mega_DuinOS.name=Arduino Mega (ATmega1280) + DuinOS
-+
-+mega_DuinOS.upload.protocol=stk500
-+mega_DuinOS.upload.maximum_size=126976
-+mega_DuinOS.upload.speed=57600
-+
-+mega_DuinOS.bootloader.low_fuses=0xFF
-+mega_DuinOS.bootloader.high_fuses=0xDA
-+mega_DuinOS.bootloader.extended_fuses=0xF5
-+mega_DuinOS.bootloader.path=atmega
-+mega_DuinOS.bootloader.file=ATmegaBOOT_168_atmega1280.hex
-+mega_DuinOS.bootloader.unlock_bits=0x3F
-+mega_DuinOS.bootloader.lock_bits=0x0F
-+
-+mega_DuinOS.build.mcu=atmega1280
-+mega_DuinOS.build.f_cpu=16000000L
-+mega_DuinOS.build.core=arduino.DuinOS
-+
-+##############################################################
-+
- mini.name=Arduino Mini
- 
- mini.upload.protocol=stk500
+8) Copiar a pasta hardware/arduino/avr/board.txt in hardware folder and patch it with the following patch :
 
 
-9) Copy arduino-00xx/lib/keywords.txt in DuinOS_v0.x/lib folder and patch it with the following patch :
+9) Copiar lib/keywords.txt em lib e aplicar o respectivo patch:
+ 
 
---- keywords.txt.ORI    2010-10-02 22:17:42.000000000 +0200
-+++ keywords.txt        2010-12-18 19:35:55.000000000 +0100
-@@ -4,6 +4,8 @@
- LOW    LITERAL1        Constants
- INPUT  LITERAL1        Constants
- OUTPUT LITERAL1        Constants
-+SERIAL LITERAL1
-+DISPLAY        LITERAL1
- DEC    LITERAL1        Serial_Print
- BIN    LITERAL1        Serial_Print
- HEX    LITERAL1        Serial_Print
-@@ -176,3 +178,34 @@
- 
- setup  KEYWORD3        Setup
- loop   KEYWORD3        Loop
-+
-+#######################################
-+# Syntax Coloring Map DuinOS
-+#######################################
-+
-+#######################################
-+# Datatypes (KEYWORD1)
-+#######################################
-+
-+taskLoop       KEYWORD1
-+
-+#######################################
-+# Methods and Functions (KEYWORD2)
-+#######################################
-+declareTaskLoop        KEYWORD2
-+createTaskLoop KEYWORD2
-+suspend        KEYWORD2
-+suspendTask    KEYWORD2
-+suspendAll     KEYWORD2
-+resumeTask     KEYWORD2
-+resumeAll      KEYWORD2
-+nextTask       KEYWORD2
-+initMainLoopPriority   KEYWORD2
-+
-+
-+#######################################
-+# Constants (LITERAL1)
-+#######################################
-+LOW_PRIORITY   LITERAL1
-+NORMAL_PRIORITY        LITERAL1
-+HIGH_PRIORITY  LITERAL1
+9) Copiar o arquivo libraries/Servo/Servo.h em libraries/Servo e aplicar o 
+respectivo patch para desabilitar o uso do Timer1 porque DuinOS usa este timer
+em seu kernel. 
 
-9) Copy arduino-00xx/libraries/Servo/Servo.h in DuinOS_v0.x/libraries/Servo folder and patch it with the following patch :
-Disable Timer1 because DuinOS uses the timer 1 for its kernel in this file
-
---- Servo.h.ORI 2010-10-02 22:17:42.000000000 +0200
-+++ Servo.h     2010-12-20 22:52:10.000000000 +0100
-@@ -59,29 +59,38 @@
- // Say which 16 bit timers can be used and in what order
- #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
- #define _useTimer5
--#define _useTimer1 
-+/* Disable Timer1 because DuinOS uses the timer 1 for its kernel
-+#define _useTimer1 */
- #define _useTimer3
--#define _useTimer4 
--typedef enum { _timer5, _timer1, _timer3, _timer4, _Nbr_16timers } timer16_Sequence_t ;
-+#define _useTimer4
-+/* Disable Timer1 because DuinOS uses the timer 1 for its kernel
-+typedef enum { _timer5, _timer1, _timer3, _timer4, _Nbr_16timers } timer16_Sequence_t ; */
-+typedef enum { _timer5, _timer3, _timer4, _Nbr_16timers } timer16_Sequence_t ;
- 
- #elif defined(__AVR_ATmega32U4__)  
- #define _useTimer3
-+/* Disable Timer1 because DuinOS uses the timer 1 for its kernel
- #define _useTimer1 
--typedef enum { _timer3, _timer1, _Nbr_16timers } timer16_Sequence_t ;
-+typedef enum { _timer3, _timer1, _Nbr_16timers } timer16_Sequence_t ; */
-+typedef enum { _timer3, _Nbr_16timers } timer16_Sequence_t ;
- 
- #elif defined(__AVR_AT90USB646__) || defined(__AVR_AT90USB1286__)
- #define _useTimer3
--#define _useTimer1
--typedef enum { _timer3, _timer1, _Nbr_16timers } timer16_Sequence_t ;
-+/* Disable Timer1 because DuinOS uses the timer 1 for its kernel
-+#define _useTimer1 
-+typedef enum { _timer3, _timer1, _Nbr_16timers } timer16_Sequence_t ; */
-+typedef enum { _timer3, _Nbr_16timers } timer16_Sequence_t ;
- 
- #elif defined(__AVR_ATmega128__) ||defined(__AVR_ATmega1281__)||defined(__AVR_ATmega2561__)
- #define _useTimer3
-+/* Disable Timer1 because DuinOS uses the timer 1 for its kernel
- #define _useTimer1
-+typedef enum { _timer3, _timer1, _Nbr_16timers } timer16_Sequence_t ; */
- typedef enum { _timer3, _timer1, _Nbr_16timers } timer16_Sequence_t ;
- 
- #else  // everything else
--#define _useTimer1
--typedef enum { _timer1, _Nbr_16timers } timer16_Sequence_t ;                  
-+/* Disable Timer1 because DuinOS uses the timer 1 for its kernel
-+typedef enum { _timer1, _Nbr_16timers } timer16_Sequence_t ; */                 
- #endif
- 
- #define Servo_VERSION           2      // software version of this library
+10) Copiar o arquivo libraries/Servo/Servo.cpp no diretorio DuinOS_v0.x/libraries/Servo 
+e aplicar o respectivo path, porque o DuinOS usa o Timer 1 em seu kernel 
 
 
-10) Copy arduino-00xx/libraries/Servo/Servo.cpp in DuinOS_v0.x/libraries/Servo folder and patch it with the following patch :
-Disable Timer1 because DuinOS uses the timer 1 for its kernel in this file
+11) Já que em alguns chips como o AtMega 168 e 328, Timer1 é desabilitado 
+porque DuinOS usa o timer 1 para seu kernel.
+E não há um timer de 16 bit para usar no Servo lib que precisa dele. 
+Então nos adicionamos o ServoTimer2 lib  (http://code.google.com/p/tricopter/source/browse/trunk/arduino/#arduino%2Flibraries%2FServoTimer2 )
+que usa o timer 2 de 8 bits para o servo.
 
---- Servo.cpp.ORI       2010-10-02 22:17:42.000000000 +0200
-+++ Servo.cpp   2010-12-20 22:57:04.000000000 +0100
-@@ -99,12 +99,13 @@
- 
- #ifndef WIRING // Wiring pre-defines signal handlers so don't define any if compiling for the Wiring platform
- // Interrupt handlers for Arduino 
-+/* Disable Timer1 because DuinOS uses the timer 1 for its kernel
- #if defined(_useTimer1)
- SIGNAL (TIMER1_COMPA_vect) 
- { 
-   handle_interrupts(_timer1, &TCNT1, &OCR1A); 
- }
--#endif
-+#endif */
- 
- #if defined(_useTimer3)
- SIGNAL (TIMER3_COMPA_vect) 
-@@ -128,13 +129,15 @@
- #endif
- 
- #elif defined WIRING
--// Interrupt handlers for Wiring 
-+// Interrupt handlers for Wiring
-+/* Disable Timer1 because DuinOS uses the timer 1 for its kernel
- #if defined(_useTimer1)
- void Timer1Service() 
- { 
-   handle_interrupts(_timer1, &TCNT1, &OCR1A); 
- }
- #endif
-+*/
- #if defined(_useTimer3)
- void Timer3Service() 
- { 
-@@ -145,7 +148,8 @@
- 
- 
- static void initISR(timer16_Sequence_t timer)
--{  
-+{
-+/* Disable Timer1 because DuinOS uses the timer 1 for its kernel  
- #if defined (_useTimer1)
-   if(timer == _timer1) {
-     TCCR1A = 0;             // normal counting mode 
-@@ -163,7 +167,7 @@
-     timerAttach(TIMER1OUTCOMPAREA_INT, Timer1Service); 
- #endif
-   } 
--#endif  
-+#endif */ 
- 
- #if defined (_useTimer3)
-   if(timer == _timer3) {
-@@ -208,6 +212,7 @@
- {
-     //disable use of the given timer
- #if defined WIRING   // Wiring
-+  /* Disable Timer1 because DuinOS uses the timer 1 for its kernel
-   if(timer == _timer1) {
-     #if defined(__AVR_ATmega1281__)||defined(__AVR_ATmega2561__)
-     TIMSK1 &=  ~_BV(OCIE1A) ;  // disable timer 1 output compare interrupt
-@@ -216,7 +221,8 @@
-     #endif
-     timerDetach(TIMER1OUTCOMPAREA_INT); 
-   }
--  else if(timer == _timer3) {     
-+  else if(timer == _timer3) { */
-+  if(timer == _timer3) {
-     #if defined(__AVR_ATmega1281__)||defined(__AVR_ATmega2561__)
-     TIMSK3 &= ~_BV(OCIE3A);    // disable the timer3 output compare A interrupt
-     #else
-
-11) Because with some chips as AtMega 168 and 328, Timer1 is disabled because DuinOS uses the timer 1 for its kernel.
-and we don't have now a 16 bit timer to use Servo lib that need it.
-Then we add ServoTimer2 lib (http://code.google.com/p/tricopter/source/browse/trunk/arduino/#arduino%2Flibraries%2FServoTimer2 )
-that use the 8 bits timer 2 for Servo.
-
-Copy the following files from this website 
+Copie o seguinte arquivo deste site na pasta libraries/ServoTimer2  
 ServoTimer2.cpp, ServoTimer2.h, keywords.txt
-in DuinOS_v0.x/libraries/ServoTimer2 folder
 
 
 
