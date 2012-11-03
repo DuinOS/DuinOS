@@ -79,6 +79,9 @@ inline void delay(const portTickType ticks)
 	vTaskDelayUntil( &xLastWakeTime, ticks);
 }
 */
+#if INCLUDE_vTaskDelete
+	#define deleteTask(name) vTaskDelete(name);
+#endif
 
 //This macro is quiet different from setPriority, because this works even in those CPUs wich does not support
 //the set/getPriority macros (due to their small RAM memories). And, this only has effect if called in setup().

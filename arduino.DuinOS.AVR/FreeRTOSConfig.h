@@ -231,7 +231,7 @@
 	#define INCLUDE_vTaskPrioritySet		1
 	#define INCLUDE_uxTaskPriorityGet		1
 	//##If the following value is set to 1, change the memory managment scheme to heap_2.c:
-	#define INCLUDE_vTaskDelete				0
+	#define INCLUDE_vTaskDelete				1
 	#define INCLUDE_vTaskCleanUpResources	0
 	#define INCLUDE_vTaskSuspend			1
 	#define INCLUDE_vTaskDelayUntil			1
