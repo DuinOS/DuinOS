@@ -1,21 +1,24 @@
 ********************************
- DuinOS v0.4 Alpha
+ DuinOS v0.6.1 Beta
 ********************************
 
 Copyright (C) 2009 Multiplo
 http://multiplo.org
 http://robotgroup.com.ar
 Created by Julián U. da Silva Gillig.
+Ported by Carlos Delfino {consultoria@carlosdelfino.eti.br}
+Copyleft (C) 2012 Carlos Delfino e Amigos
+http://www.carlosdelfino.eti.br
 
-Based on the FreeRTOS v6.1.0 kernel (www.freertos.org). Please see the License section below.
+Based on the FreeRTOS v7.3.0 kernel (www.freertos.org). Please see the License section below.
 This is our only distribution of DuinOS, which includes the complete source code. The last version is always available
-from http://robotgroup.com.ar
+from https://github.com/CarlosDelfino/DuinOS/downloads
 
 
 ********************************
  License
 ********************************
-The DuinOS kernel (cores\arduino.DuinOS) is under the same license as the FreeRTOS operating system (www.freertos.org)
+The DuinOS kernel (cores\arduino.DuinOS.*) is under the same license as the FreeRTOS operating system (www.freertos.org)
 Please see the included FreeRTOS.license.txt file.
 
 We have used too, some files belonging to the AVR port of the FreeRTOS operating system, made by Micropendous 
@@ -29,7 +32,7 @@ By Opendous Inc.
 www.Micropendous.org
 October 04, 2009
 
-Please visit www.micropendous.org if there is any doubt.
+Please visit www.micropendous.org or contact consultoria@carlosdelfino.eti if there is any doubt
 
 NOTE: We strongly believe in peace, so we would not like to see our work in any non-civil or military project. But, due
 to the FreeRTOS's modified GPL license which we do have to maintain, this is only a recommendation and an expression of
@@ -41,14 +44,14 @@ our wishes.
 ********************************
 
 0. Close the Arduino IDE (all instances).
-1. Copy the arduino.DuinOS folder to the \hardware\cores folder.
-2. Rename your current \hardware\boards.txt file.
-3. Copy the boards.txt deployed with DuinOS to the \hardware folder.
+1. Copy the arduino.DuinOS.* folder to the \hardware\arduino\*\cores folder.
+2. Rename your current \hardware\arduino\*\boards.txt file.
+3. Copy the *\boards.txt deployed with DuinOS to the \hardware\arduino\* folder, remember eatch borads.*.txt for respective hardware folder.
 4. Rename your current \lib\keywords.txt file.
 5. Copy the keywords.txt deployed with DuinOS to the \lib folder.
 6. Start the Arduino IDE.
 7. Please select any DuinOS board from the Tools->Board menu, like the "Arduino Duemilanove or Nano w/ ATmega328 + DuinOS".
-8. Now, you can compile any standard project, but we suggest the \examples\MoreComplexBlinking deployed with DuinOS.
+8. Now, you can compile any standard project, but we suggest the \examples\DuinOS\MoreComplexBlinking deployed with DuinOS.
 
 ********************************
  Uninstall 
@@ -57,7 +60,7 @@ our wishes.
 0. Close the Arduino IDE (all instances).
 1. If you have renamed the original boards.txt file, delete the current boards.txt file and rename the previous one (so it will be now your new boards.txt).
 2. If you have renamed the original keywords.txt file, delete the current keywords.txt file and rename the previous one (so it will be now your new keywords.txt).
-3. Delete the arduino.DuinOS folder from the \cores folder.
+3. Delete the arduino.DuinOS folder from the \cores\arduino\* folder.
 4. Now you can restart the Arduino IDE and keep working without DuinOS. 
 
 ********************************
@@ -112,4 +115,10 @@ MATERIALS ON THIS WEBSITE.
 - Use Timer0 for FreeRTOS
 - Remove Servo library (standard one should work)
 * 0.
- 
+* 0.
+* 0.6.1 Beta / 2012.01.01 (Carlos Delfino <consultoria@carlosdelfino.eti.br>)
+- Arduino IDE updated to version 1.5.0
+- FreeRTOS updated to 7.3.0
+- Tested with MoreComplexBlinking example on Arduino UNO e Arduino Mega
+- created a folder for eatch mcu (AVR and ARM)
+- created a folder boards for eatch mcu 
