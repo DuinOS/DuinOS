@@ -1,7 +1,10 @@
 #include <Arduino.h>
 
 
+unsigned portBASE_TYPE mainSetupPriority;
+unsigned portBASE_TYPE mainSetupStackSize;
 unsigned portBASE_TYPE mainLoopPriority;
+unsigned portBASE_TYPE mainLoopStackSize;
 
 xTaskHandle xHandleLoop;
 xTaskHandle xHandleSetup;
@@ -29,7 +32,10 @@ void setup_Task(void *pvParameters)
 
 int main(void)
 {
+	mainSetupPriority = HIGH_PRIORITY;
+	mainSetupStackSize = configMINIMAL_STACK_SIZE * 2;
 	mainLoopPriority = LOW_PRIORITY;
+	mainLoopStackSize = configMINIMAL_STACK_SIZE;
 	init();
 
 #if defined(USBCON)
@@ -38,9 +44,9 @@ int main(void)
 
 //	setup();
 
-	xTaskCreate(setup_Task, (signed portCHAR *) "setup", configMINIMAL_STACK_SIZE, NULL, HIGH_PRIORITY, &xHandleSetup);
+	xTaskCreate(setup_Task, (signed portCHAR *) "setup", mainSetupStackSize, NULL, mainSetupStackSize, &xHandleSetup);
 
-	xTaskCreate(main_Task, (signed portCHAR *) "main", configMINIMAL_STACK_SIZE, NULL, mainLoopPriority, &xHandleLoop);
+	xTaskCreate(main_Task, (signed portCHAR *) "main", mainLoopStackSize, NULL, mainLoopPriority, &xHandleLoop);
 	vTaskSuspend(xHandleLoop);
 
 	vTaskStartScheduler();
