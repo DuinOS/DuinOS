@@ -226,7 +226,13 @@ static void prvSetupTimerInterrupt( void );
  */
 portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE pxCode, void *pvParameters )
 {
-unsigned portSHORT usAddress;
+        /* ATmega2560 DuinOS port by SkyWodd */
+#if defined(__AVR_ATmega2560__)
+        unsigned portLONG usAddress; // ATMega2560 have 22bit Program Counter register
+#else
+        unsigned portSHORT usAddress; // over ATmega have 16bit Program Counter register
+#endif
+
 
 	/* Place a few bytes of known values on the bottom of the stack. 
 	This is just useful for debugging. */
@@ -243,6 +249,23 @@ unsigned portSHORT usAddress;
 
 	/*lint -e950 -e611 -e923 Lint doesn't like this much - but nothing I can do about it. */
 
+#if defined(__AVR_ATmega2560__)
+    // Implement normal stack initialisation but with portLONG instead of portSHORT
+        usAddress = ( unsigned portLONG ) pxCode;
+        *pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portLONG ) 0x000000ff );
+        pxTopOfStack--;
+
+        usAddress >>= 8;
+        *pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portLONG ) 0x000000ff );
+        pxTopOfStack--;
+
+        // Implemented the 3byte addressing
+        usAddress >>= 8;
+        *pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portLONG ) 0x000000ff );
+        pxTopOfStack--;
+
+// Normal initialisation for over ATmega
+#else
 	/* The start of the task code will be popped off the stack last, so place
 	it on first. */
 	usAddress = ( unsigned portSHORT ) pxCode;
@@ -252,6 +275,7 @@ unsigned portSHORT usAddress;
 	usAddress >>= 8;
 	*pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portSHORT ) 0x00ff );
 	pxTopOfStack--;
+#endif
 
 	/* Next simulate the stack as if after a call to portSAVE_CONTEXT().  
 	portSAVE_CONTEXT places the flags on the stack immediately after r0
