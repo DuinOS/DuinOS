@@ -3,8 +3,8 @@
 
 
 
-//LiquidCrystal lcd(10,11,2,3,4,5);
-LiquidCrystal2 lcd(10,11,22,24,26,28);
+LiquidCrystal2 lcd(10,11,2,3,4,5);
+//LiquidCrystal2 lcd(10,11,22,24,26,28);
 
 void setup(){
     lcd.begin(16,2);
@@ -17,7 +17,7 @@ void setup(){
     lcd.write("1234567890123456");
 }
 
-volatile int x = 0;
+volatile int x = 40;
 void loop(){
     //lcd.write("1234567890123456");
     //lcd.write("1234567890123456");
@@ -28,7 +28,7 @@ delay(3);
 delay(3);
 
 //taskENTER_CRITICAL();
-lcd.write(x++);
+lcd.print(x++);
 //taskEXIT_CRITICAL();     
 
 lcd.print("teste ");
@@ -45,5 +45,6 @@ lcd.print("teste ");
     
      
 }
+
 
 
