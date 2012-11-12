@@ -81,7 +81,7 @@
 	//##Multiplo.Brain.M644:
 	#define configUSE_PREEMPTION		1
 	#define configUSE_IDLE_HOOK			0
-	#define configUSE_TICK_HOOK			0
+	#define configUSE_TICK_HOOK			1
 
 	//##20091029: Use compiler defined freq.:
 	#define configCPU_CLOCK_HZ			( ( unsigned portLONG ) F_CPU )
@@ -121,7 +121,7 @@
 	//##Multiplo.Brain.M1284
 	#define configUSE_PREEMPTION		1
 	#define configUSE_IDLE_HOOK			0
-	#define configUSE_TICK_HOOK			0
+	#define configUSE_TICK_HOOK			1
 
 	//##20091029: Use compiler defined freq.:
 	#define configCPU_CLOCK_HZ			( ( unsigned portLONG ) F_CPU )
@@ -161,7 +161,7 @@
 
 	#define configUSE_PREEMPTION		1
 	#define configUSE_IDLE_HOOK			0
-	#define configUSE_TICK_HOOK			0
+	#define configUSE_TICK_HOOK			1
 
 	//##20091029: Use compiler defined freq.:
 	#define configCPU_CLOCK_HZ			( ( unsigned portLONG ) F_CPU )
@@ -202,7 +202,7 @@
 
 	#define configUSE_PREEMPTION		1
 	#define configUSE_IDLE_HOOK			0
-	#define configUSE_TICK_HOOK			0
+	#define configUSE_TICK_HOOK			1
 
 	//##20091029: Use compiler defined freq.:
 	#define configCPU_CLOCK_HZ			( ( unsigned portLONG ) F_CPU )
@@ -231,7 +231,7 @@
 	#define INCLUDE_vTaskPrioritySet		1
 	#define INCLUDE_uxTaskPriorityGet		1
 	//##If the following value is set to 1, change the memory managment scheme to heap_2.c:
-	#define INCLUDE_vTaskDelete				0
+	#define INCLUDE_vTaskDelete				1
 	#define INCLUDE_vTaskCleanUpResources	0
 	#define INCLUDE_vTaskSuspend			1
 	#define INCLUDE_vTaskDelayUntil			1
@@ -242,7 +242,7 @@
 
 	#define configUSE_PREEMPTION		1
 	#define configUSE_IDLE_HOOK			0
-	#define configUSE_TICK_HOOK			0
+	#define configUSE_TICK_HOOK			1
 
 	//##20091029: Use compiler defined freq.:
 	#define configCPU_CLOCK_HZ			( ( unsigned portLONG ) F_CPU )
@@ -281,7 +281,7 @@
 
 	#define configUSE_PREEMPTION		1
 	#define configUSE_IDLE_HOOK			0
-	#define configUSE_TICK_HOOK			0
+	#define configUSE_TICK_HOOK			1
 
 	//##20091029: Use compiler defined freq.:
 	#define configCPU_CLOCK_HZ			( ( unsigned portLONG ) F_CPU )
