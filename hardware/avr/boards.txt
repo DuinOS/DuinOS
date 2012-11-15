@@ -161,8 +161,8 @@ mega2560.build.variant=mega
 ##############################################################
 
 mega2560_DuinOS.name=Arduino Mega 2560 or Mega ADK + DuinOS
-mega2560_DuinOS.cpu=2560 or ADK
-mega2560_DuinOS.container=Arduino Mega 2560 + DuinOS
+#mega2560_DuinOS.cpu=2560 or ADK
+#mega2560_DuinOS.container=Arduino Mega 2560 + DuinOS
 
 mega2560_DuinOS.upload.tool=avrdude
 mega2560_DuinOS.upload.protocol=wiring
@@ -185,8 +185,8 @@ mega2560_DuinOS.build.variant=mega
 ##############################################################
 
 mega.name=Arduino Mega (ATmega1280)
-mega.cpu=ATmega1280
-mega.container=Arduino Mega 1280
+#mega.cpu=ATmega1280
+#mega.container=Arduino Mega 1280
 
 mega.upload.tool=avrdude
 mega.upload.protocol=arduino
@@ -209,8 +209,8 @@ mega.build.variant=mega
 ##############################################################
 
 mega_DuinOS.name=Arduino Mega (ATmega1280) + DuinOS
-mega_DuinOS.cpu=ATmega1280
-mega_DuinOS.container=Arduino Mega 1280 + DuinOS
+#mega_DuinOS.cpu=ATmega1280
+#mega_DuinOS.container=Arduino Mega 1280 + DuinOS
 
 mega_DuinOS.upload.tool=avrdude
 mega_DuinOS.upload.protocol=arduino
