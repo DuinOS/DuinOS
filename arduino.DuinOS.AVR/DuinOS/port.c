@@ -475,14 +475,16 @@ static void prvSetupTimerInterrupt( void )
 	void SIG_OUTPUT_COMPARE1A( void ) __attribute__ ( ( signal, naked ) );
 	void SIG_OUTPUT_COMPARE1A( void )
 	*/
-	#if defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
-	ISR(TIM0_OVF_vect)
+#if defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
+		void TIM0_OVF_vect(void) __attribute__ ((signal,__INTR_ATTRS,naked));
+		void TIM0_OVF_vect(void)
 	#else
-	ISR(TIMER0_OVF_vect)
+		void TIMER0_OVF_vect(void) __attribute__ ((signal,__INTR_ATTRS,naked));
+		void TIMER0_OVF_vect(void)
 	#endif
 	{
 		vPortYieldFromTick();
-		//asm volatile ( "reti" );
+		asm volatile ( "reti" );
 	}
 #else
 
@@ -496,9 +498,11 @@ static void prvSetupTimerInterrupt( void )
 	void SIG_OUTPUT_COMPARE1A( void )
 	*/
 	#if defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
-	SIGNAL(TIM0_OVF_vect)
+		void TIM0_OVF_vect(void) __attribute__ ((signal,__INTR_ATTRS));
+		void TIM0_OVF_vect(void)
 	#else
-	SIGNAL(TIMER0_OVF_vect)
+		void TIMER0_OVF_vect(void) __attribute__ ((signal,__INTR_ATTRS));
+		void TIMER0_OVF_vect(void)
 	#endif
 	{
 		vTaskIncrementTick();
