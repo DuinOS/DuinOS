@@ -74,6 +74,17 @@ void name##Function()
 #define nextTask() taskYIELD()
 
 #define delay(ticks) vTaskDelay(ticks)
+
+#define criticalFunction(region) void region##_CriticalFunction(void);\
+	{\
+		enterCritical();\
+		region##_CriticalFunction();\
+		exitCritical();\
+	}\
+	void region##_CriticalFunction(void)
+
+#define enterCritical()     portENTER_CRITICAL()
+#define exitCritical()     portEXIT_CRITICAL()
 /*
 inline void delay(const portTickType ticks)
 {
