@@ -475,7 +475,7 @@ static void prvSetupTimerInterrupt( void )
 	void SIG_OUTPUT_COMPARE1A( void ) __attribute__ ( ( signal, naked ) );
 	void SIG_OUTPUT_COMPARE1A( void )
 	*/
-	#if defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
+#if defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
 		void TIM0_OVF_vect(void) __attribute__ ((signal,__INTR_ATTRS,naked));
 		void TIM0_OVF_vect(void)
 	#else
