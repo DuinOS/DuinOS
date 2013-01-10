@@ -421,7 +421,7 @@ void vPortYieldFromTick( void )
 /*-----------------------------------------------------------*/
 
 /*
- * Setup timer 1 compare match A to generate a tick interrupt.
+ * Setup timer 0 compare match A to generate a tick interrupt.
  */
 static void prvSetupTimerInterrupt( void )
 {
