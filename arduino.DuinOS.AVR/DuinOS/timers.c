@@ -512,27 +512,25 @@ xTIMER *pxTimer;
 portBASE_TYPE xTimerListsWereSwitched, xResult;
 portTickType xTimeNow;
 
-	/* In this case the xTimerListsWereSwitched parameter is not used, but it
-	must be present in the function call. */
-	xTimeNow = prvSampleTimeNow( &xTimerListsWereSwitched );
-
 	while( xQueueReceive( xTimerQueue, &xMessage, tmrNO_DELAY ) != pdFAIL )
 	{
 		pxTimer = xMessage.pxTimer;
 
-		/* Is the timer already in a list of active timers?  When the command
-		is trmCOMMAND_PROCESS_TIMER_OVERFLOW, the timer will be NULL as the
-		command is to the task rather than to an individual timer. */
-		if( pxTimer != NULL )
+		if( listIS_CONTAINED_WITHIN( NULL, &( pxTimer->xTimerListItem ) ) == pdFALSE )
 		{
-			if( listIS_CONTAINED_WITHIN( NULL, &( pxTimer->xTimerListItem ) ) == pdFALSE )
-			{
-				/* The timer is in a list, remove it. */
-				uxListRemove( &( pxTimer->xTimerListItem ) );
-			}
+			/* The timer is in a list, remove it. */
+			uxListRemove( &( pxTimer->xTimerListItem ) );
 		}
 
 		traceTIMER_COMMAND_RECEIVED( pxTimer, xMessage.xMessageID, xMessage.xMessageValue );
+
+		/* In this case the xTimerListsWereSwitched parameter is not used, but 
+		it must be present in the function call.  prvSampleTimeNow() must be 
+		called after the message is received from xTimerQueue so there is no 
+		possibility of a higher priority task adding a message to the message
+		queue with a time that is ahead of the timer daemon task (because it
+		pre-empted the timer daemon task after the xTimeNow value was set). */
+		xTimeNow = prvSampleTimeNow( &xTimerListsWereSwitched );
 
 		switch( xMessage.xMessageID )
 		{
@@ -686,3 +684,6 @@ xTIMER *pxTimer = ( xTIMER * ) xTimer;
 to include software timer functionality.  If you want to include software timer
 functionality then ensure configUSE_TIMERS is set to 1 in FreeRTOSConfig.h. */
 #endif /* configUSE_TIMERS == 1 */
+
+
+
