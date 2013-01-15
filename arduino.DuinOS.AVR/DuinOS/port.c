@@ -251,18 +251,18 @@ portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE
 
 #if defined(__AVR_ATmega2560__)
     // Implement normal stack initialisation but with portLONG instead of portSHORT
-        usAddress = ( unsigned portLONG ) pxCode;
-        *pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portLONG ) 0x000000ff );
-        pxTopOfStack--;
+    usAddress = ( unsigned portLONG ) pxCode;
+    *pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portLONG ) 0x000000ff );
+    pxTopOfStack--;
 
-        usAddress >>= 8;
-        *pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portLONG ) 0x000000ff );
-        pxTopOfStack--;
+    usAddress >>= 8;
+    *pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portLONG ) 0x000000ff );
+    pxTopOfStack--;
 
-        // Implemented the 3byte addressing
-        usAddress >>= 8;
-        *pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portLONG ) 0x000000ff );
-        pxTopOfStack--;
+    // Implemented the 3byte addressing
+    usAddress >>= 8;
+    *pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portLONG ) 0x000000ff );
+    pxTopOfStack--;
 
 // Normal initialisation for over ATmega
 #else
