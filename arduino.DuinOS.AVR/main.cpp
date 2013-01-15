@@ -32,10 +32,10 @@ void setup_Task(void *pvParameters)
 
 int main(void)
 {
-	mainSetupPriority = HIGH_PRIORITY;
+	mainSetupPriority  = HIGH_PRIORITY;
 	mainSetupStackSize = configMINIMAL_STACK_SIZE * 2;
-	mainLoopPriority = LOW_PRIORITY;
-	mainLoopStackSize = configMINIMAL_STACK_SIZE;
+	mainLoopPriority   = LOW_PRIORITY;
+	mainLoopStackSize  = configMINIMAL_STACK_SIZE;
 	init();
 
 #if defined(USBCON)
