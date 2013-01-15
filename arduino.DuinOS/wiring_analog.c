@@ -209,7 +209,7 @@ void analogWrite(uint8_t pin, int val)
 				break;
 			#endif
 
-			#if defined(TCCR4A) && defined(COM4A1)
+			#if defined(TCCR4A)
 			case TIMER4A:
 				//connect pwm to pin on timer 4, channel A
 				sbi(TCCR4A, COM4A1);
