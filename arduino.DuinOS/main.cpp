@@ -16,9 +16,11 @@ int main(void)
 	mainLoopPriority = LOW_PRIORITY;
 
 	init();
+
 #if defined(USBCON)
-	USB.attach();
+	USBDevice.attach();
 #endif
+	
 	setup();
 
 	xTaskCreate(main_Task, (signed portCHAR *) "main", configMINIMAL_STACK_SIZE, NULL, mainLoopPriority, NULL);
@@ -28,3 +30,4 @@ int main(void)
 
 	return 0;
 }
+

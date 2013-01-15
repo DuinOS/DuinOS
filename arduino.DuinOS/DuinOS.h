@@ -27,6 +27,7 @@ extern "C"
 #endif
 
 extern unsigned portBASE_TYPE mainLoopPriority;
+extern unsigned portBASE_TYPE mainLoopStackSize;
 
 //In small devices, we use only 3 priorities:
 #define LOW_PRIORITY		(tskIDLE_PRIORITY)
@@ -45,7 +46,10 @@ void name##Function()
 
 //This macro enables the forward declaration of a task, to allow other tasks previous defined (with the
 //taskLoop()macro use and reference them:
-#define declareTaskLoop(name) extern xTaskHandle name
+#define declareTaskLoop(name)\
+	extern xTaskHandle name;\
+    void name##_Task(void*)
+
 
 #define createTaskLoop(name, priority)\
 {\
@@ -70,6 +74,17 @@ void name##Function()
 #define nextTask() taskYIELD()
 
 #define delay(ticks) vTaskDelay(ticks)
+
+#define criticalFunction(region) void region##_CriticalFunction(void);\
+	{\
+		enterCritical();\
+		region##_CriticalFunction();\
+		exitCritical();\
+	}\
+	void region##_CriticalFunction(void)
+
+#define enterCritical()     portENTER_CRITICAL()
+#define exitCritical()     portEXIT_CRITICAL()
 /*
 inline void delay(const portTickType ticks)
 {
@@ -79,10 +94,18 @@ inline void delay(const portTickType ticks)
 	vTaskDelayUntil( &xLastWakeTime, ticks);
 }
 */
+#if INCLUDE_vTaskDelete
+	#define deleteTask(name) vTaskDelete(name);
+#endif
 
 //This macro is quiet different from setPriority, because this works even in those CPUs wich does not support
 //the set/getPriority macros (due to their small RAM memories). And, this only has effect if called in setup().
 #define initMainLoopPriority(priority) (mainLoopPriority = priority)
+
+//This macro set the StackSize for use in Main Loop.
+//Use with care for not drain all memory
+//And, this only has effect if called in setup().
+#define initMainLoopStackSize(ssize) (mainLoopStackSize = ssize)
 
 //These only works if INCLUDE_vTaskPrioritySet / INCLUDE_vTaskPriorityGet are != 0
 //(disabled for CPUs with less than 2KB RAM):

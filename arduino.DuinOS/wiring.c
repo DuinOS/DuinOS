@@ -108,8 +108,26 @@ void delayMicroseconds(unsigned int us)
 	// calling avrlib's delay_us() function with low values (e.g. 1 or
 	// 2 microseconds) gives delays longer than desired.
 	//delay_us(us);
+#if F_CPU >= 20000000L
+	// for the 20 MHz clock on rare Arduino boards
 
-#if F_CPU >= 16000000L
+	// for a one-microsecond delay, simply wait 2 cycle and return. The overhead
+	// of the function call yields a delay of exactly a one microsecond.
+	__asm__ __volatile__ (
+		"nop" "\n\t"
+		"nop"); //just waiting 2 cycle
+	if (--us == 0)
+		return;
+
+	// the following loop takes a 1/5 of a microsecond (4 cycles)
+	// per iteration, so execute it five times for each microsecond of
+	// delay requested.
+	us = (us<<2) + us; // x5 us
+
+	// account for the time taken in the preceeding commands.
+	us -= 2;
+
+#elif F_CPU >= 16000000L
 	// for the 16 MHz clock on most Arduino boards
 
 	// for a one-microsecond delay, simply return.  the overhead
@@ -157,11 +175,12 @@ void init()
 	// this needs to be called before setup() or some functions won't
 	// work there
 	sei();
-	
+
 	// timers 1 and 2 are used for phase-correct hardware pwm
 	// this is better for motors as it ensures an even waveform
 	// note, however, that fast pwm mode can achieve a frequency of up
 	// 8 MHz (with a 16 MHz clock) at 50% duty cycle
+
 #if defined(TCCR1B) && defined(CS11) && defined(CS10)
 	TCCR1B = 0;
 
@@ -182,6 +201,7 @@ void init()
 #elif defined(TCCR1)
 	#warning this needs to be finished
 #endif
+
 	// set timer 2 prescale factor to 64
 #if defined(TCCR2) && defined(CS22)
 	sbi(TCCR2, CS22);
@@ -205,12 +225,21 @@ void init()
 	sbi(TCCR3B, CS30);
 	sbi(TCCR3A, WGM30);		// put timer 3 in 8-bit phase correct pwm mode
 #endif
-	
+
+#if defined(TCCR4A) && defined(TCCR4B) && defined(TCCR4D) /* beginning of timer4 block for 32U4 and similar */
+	sbi(TCCR4B, CS42);		// set timer4 prescale factor to 64
+	sbi(TCCR4B, CS41);
+	sbi(TCCR4B, CS40);
+	sbi(TCCR4D, WGM40);		// put timer 4 in phase- and frequency-correct PWM mode	
+	sbi(TCCR4A, PWM4A);		// enable PWM mode for comparator OCR4A
+	sbi(TCCR4C, PWM4D);		// enable PWM mode for comparator OCR4D
+#else /* beginning of timer4 block for ATMEGA1280 and ATMEGA2560 */
 #if defined(TCCR4B) && defined(CS41) && defined(WGM40)
 	sbi(TCCR4B, CS41);		// set timer 4 prescale factor to 64
 	sbi(TCCR4B, CS40);
 	sbi(TCCR4A, WGM40);		// put timer 4 in 8-bit phase correct pwm mode
 #endif
+#endif /* end timer4 block for ATMEGA1280/2560 and similar */	
 
 #if defined(TCCR5B) && defined(CS51) && defined(WGM50)
 	sbi(TCCR5B, CS51);		// set timer 5 prescale factor to 64
