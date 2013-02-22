@@ -1,0 +1,10 @@
+Atualização do DuinOS para o FreeRTOS V7.4.0
+1831:
+Prepare for V7.4.0 release.
+1829:
+Correct spelling of xSuspendedTaskList in eTaskConfirmSleepModeStatus().
+1828:
+Add default definition for configUSE_QUEUE_SETS.
+Add eTaskConfirmSleepModeStatus() (not yet tested).
+Only call prvQueueUnregisterQueue() when a queue or semaphore is deleted if configQUEUE_REGISTRY_SIZE > 0.
+Back out change that checks the configUSE_PORT_OPTMISED_TASK_SELECTION value before uxPriorityUsedOnEntry is set in vTaskPrioritySet as it generated more warnings (with other compilers) than it fixed.

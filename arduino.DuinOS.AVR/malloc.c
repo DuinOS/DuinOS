@@ -32,7 +32,7 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
 */
-
+ 
 
 #include <stdlib.h>
 #include <inttypes.h>
@@ -58,7 +58,7 @@ struct __freelist {
  * calls must not require more stack space, or they'll risk to collide
  * with the data segment.
  */
-
+ 
 
 #define STACK_POINTER() ((char *)AVR_STACK_POINTER_REG)
 extern char __heap_start;

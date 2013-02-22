@@ -1242,9 +1242,6 @@ tskTCB * pxNewTCB;
 
 #endif /* ( ( INCLUDE_xTaskResumeFromISR == 1 ) && ( INCLUDE_vTaskSuspend == 1 ) ) */
 
-
-
-
 /*-----------------------------------------------------------
  * PUBLIC SCHEDULER CONTROL documented in task.h
  *----------------------------------------------------------*/

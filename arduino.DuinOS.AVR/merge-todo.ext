@@ -1,0 +1,9 @@
+merge-todo.ext
+
+ Created on: 29/01/2013
+     Author: Carlos Delfino (consultoria@carlosdelfino.eti.br)
+     
+Ao fazer o Merge dos Branchs e Tags verificar sempre os itens abaixo:
+
+O Arquivo portable.h deve ser verificado já que tirei deste as verificaçòes a chamadas para multiplataforma
+
