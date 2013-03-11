@@ -1,7 +1,7 @@
 /*
-    FreeRTOS V7.4.0 - Copyright (C) 2013 Real Time Engineers Ltd.
+    FreeRTOS V7.3.0 - Copyright (C) 2012 Real Time Engineers Ltd.
 
-    FEATURES AND PORTS ARE ADDED TO FREERTOS ALL THE TIME.  PLEASE VISIT
+    FEATURES AND PORTS ARE ADDED TO FREERTOS ALL THE TIME.  PLEASE VISIT 
     http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
 
     ***************************************************************************
@@ -29,23 +29,20 @@
     FreeRTOS is free software; you can redistribute it and/or modify it under
     the terms of the GNU General Public License (version 2) as published by the
     Free Software Foundation AND MODIFIED BY the FreeRTOS exception.
-
-    >>>>>>NOTE<<<<<< The modification to the GPL is included to allow you to
+    >>>NOTE<<< The modification to the GPL is included to allow you to
     distribute a combined work that includes FreeRTOS without being obliged to
     provide the source code for proprietary components outside of the FreeRTOS
-    kernel.
-
-    FreeRTOS is distributed in the hope that it will be useful, but WITHOUT ANY
-    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-    details. You should have received a copy of the GNU General Public License
-    and the FreeRTOS license exception along with FreeRTOS; if not itcan be
-    viewed here: http://www.freertos.org/a00114.html and also obtained by
-    writing to Real Time Engineers Ltd., contact details for whom are available
-    on the FreeRTOS WEB site.
+    kernel.  FreeRTOS is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+    more details. You should have received a copy of the GNU General Public
+    License and the FreeRTOS license exception along with FreeRTOS; if not it
+    can be viewed here: http://www.freertos.org/a00114.html and also obtained
+    by writing to Richard Barry, contact details for whom are available on the
+    FreeRTOS WEB site.
 
     1 tab == 4 spaces!
-
+    
     ***************************************************************************
      *                                                                       *
      *    Having a problem?  Start by reading the FAQ "My application does   *
@@ -55,21 +52,18 @@
      *                                                                       *
     ***************************************************************************
 
-
-    http://www.FreeRTOS.org - Documentation, books, training, latest versions, 
-    license and Real Time Engineers Ltd. contact details.
-
-    http://www.FreeRTOS.org/plus - A selection of FreeRTOS ecosystem products,
-    including FreeRTOS+Trace - an indispensable productivity tool, and our new
-    fully thread aware and reentrant UDP/IP stack.
-
-    http://www.OpenRTOS.com - Real Time Engineers ltd license FreeRTOS to High 
-    Integrity Systems, who sell the code with commercial support, 
-    indemnification and middleware, under the OpenRTOS brand.
     
-    http://www.SafeRTOS.com - High Integrity Systems also provide a safety 
-    engineered and independently SIL3 certified version for use in safety and 
-    mission critical applications that require provable dependability.
+    http://www.FreeRTOS.org - Documentation, training, latest versions, license 
+    and contact details.  
+    
+    http://www.FreeRTOS.org/plus - A selection of FreeRTOS ecosystem products,
+    including FreeRTOS+Trace - an indispensable productivity tool.
+
+    Real Time Engineers ltd license FreeRTOS to High Integrity Systems, who sell 
+    the code with commercial support, indemnification, and middleware, under 
+    the OpenRTOS brand: http://www.OpenRTOS.com.  High Integrity Systems also
+    provide a safety engineered and independently SIL3 certified version under 
+    the SafeRTOS brand: http://www.SafeRTOS.com.
 */
 
 /* 
@@ -125,7 +119,56 @@ extern volatile tskTCB * volatile pxCurrentTCB;
  * The interrupts will have been disabled during the call to portSAVE_CONTEXT()
  * so we need not worry about reading/writing to the stack pointer. 
  */
-
+#if defined(__AVR_ATmega2560__)
+#define portSAVE_CONTEXT()									\
+	asm volatile (	"push	r0						\n\t"	\
+					"in		r0, __SREG__			\n\t"	\
+					"cli							\n\t"	\
+					"push	r0						\n\t"	\
+					"push	r0						\n\t"	\
+					"in		r0, 0x3b				\n\t"	\
+					"push	r0						\n\t"	\
+					"in		r0, 0x3c				\n\t"	\
+					"push	r1						\n\t"	\
+					"clr	r1						\n\t"	\
+					"push	r2						\n\t"	\
+					"push	r3						\n\t"	\
+					"push	r4						\n\t"	\
+					"push	r5						\n\t"	\
+					"push	r6						\n\t"	\
+					"push	r7						\n\t"	\
+					"push	r8						\n\t"	\
+					"push	r9						\n\t"	\
+					"push	r10						\n\t"	\
+					"push	r11						\n\t"	\
+					"push	r12						\n\t"	\
+					"push	r13						\n\t"	\
+					"push	r14						\n\t"	\
+					"push	r15						\n\t"	\
+					"push	r16						\n\t"	\
+					"push	r17						\n\t"	\
+					"push	r18						\n\t"	\
+					"push	r19						\n\t"	\
+					"push	r20						\n\t"	\
+					"push	r21						\n\t"	\
+					"push	r22						\n\t"	\
+					"push	r23						\n\t"	\
+					"push	r24						\n\t"	\
+					"push	r25						\n\t"	\
+					"push	r26						\n\t"	\
+					"push	r27						\n\t"	\
+					"push	r28						\n\t"	\
+					"push	r29						\n\t"	\
+					"push	r30						\n\t"	\
+					"push	r31						\n\t"	\
+					"lds	r26, pxCurrentTCB		\n\t"	\
+					"lds	r27, pxCurrentTCB + 1	\n\t"	\
+					"in		r0, 0x3d				\n\t"	\
+					"st		x+, r0					\n\t"	\
+					"in		r0, 0x3e				\n\t"	\
+					"st		x+, r0					\n\t"	\
+				);
+#else
 #define portSAVE_CONTEXT()									\
 	asm volatile (	"push	r0						\n\t"	\
 					"in		r0, __SREG__			\n\t"	\
@@ -170,12 +213,14 @@ extern volatile tskTCB * volatile pxCurrentTCB;
 					"in		r0, 0x3e				\n\t"	\
 					"st		x+, r0					\n\t"	\
 				);
+#endif
 
 /* 
  * Opposite to portSAVE_CONTEXT().  Interrupts will have been disabled during
  * the context save so we can write to the stack pointer. 
  */
 
+#if defined(__AVR_ATmega2560__)
 #define portRESTORE_CONTEXT()								\
 	asm volatile (	"lds	r26, pxCurrentTCB		\n\t"	\
 					"lds	r27, pxCurrentTCB + 1	\n\t"	\
@@ -215,9 +260,61 @@ extern volatile tskTCB * volatile pxCurrentTCB;
 					"pop	r2						\n\t"	\
 					"pop	r1						\n\t"	\
 					"pop	r0						\n\t"	\
+					"out	0x3c, r0				\n\t"	\
+					"pop	r0						\n\t"	\
+					"out	0x3b, r0				\n\t"	\
+					"pop	r0						\n\t"	\
 					"out	__SREG__, r0			\n\t"	\
 					"pop	r0						\n\t"	\
 				);
+#else
+#define portRESTORE_CONTEXT()								\
+	asm volatile (	"lds	r26, pxCurrentTCB		\n\t"	\
+					"lds	r27, pxCurrentTCB + 1	\n\t"	\
+					"ld		r28, x+					\n\t"	\
+					"out	__SP_L__, r28			\n\t"	\
+					"ld		r29, x+					\n\t"	\
+					"out	__SP_H__, r29			\n\t"	\
+					"pop	r31						\n\t"	\
+					"pop	r30						\n\t"	\
+					"pop	r29						\n\t"	\
+					"pop	r28						\n\t"	\
+					"pop	r27						\n\t"	\
+					"pop	r26						\n\t"	\
+					"pop	r25						\n\t"	\
+					"pop	r24						\n\t"	\
+					"pop	r23						\n\t"	\
+					"pop	r22						\n\t"	\
+					"pop	r21						\n\t"	\
+					"pop	r20						\n\t"	\
+					"pop	r19						\n\t"	\
+					"pop	r18						\n\t"	\
+					"pop	r17						\n\t"	\
+					"pop	r16						\n\t"	\
+					"pop	r15						\n\t"	\
+					"pop	r14						\n\t"	\
+					"pop	r13						\n\t"	\
+					"pop	r12						\n\t"	\
+					"pop	r11						\n\t"	\
+					"pop	r10						\n\t"	\
+					"pop	r9						\n\t"	\
+					"pop	r8						\n\t"	\
+					"pop	r7						\n\t"	\
+					"pop	r6						\n\t"	\
+					"pop	r5						\n\t"	\
+					"pop	r4						\n\t"	\
+					"pop	r3						\n\t"	\
+					"pop	r2						\n\t"	\
+					"pop	r1						\n\t"	\
+					"pop	r0						\n\t"	\
+					"out	0x3c, r0				\n\t"	\
+					"pop	r0						\n\t"	\
+					"out	0x3b, r0				\n\t"	\
+					"pop	r0						\n\t"	\
+					"out	__SREG__, r0			\n\t"	\
+					"pop	r0						\n\t"	\
+				);
+#endif
 
 /*-----------------------------------------------------------*/
 
@@ -232,9 +329,10 @@ static void prvSetupTimerInterrupt( void );
  */
 portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE pxCode, void *pvParameters )
 {
-        /* ATmega2560 DuinOS port by SkyWodd */
 #if defined(__AVR_ATmega2560__)
-        unsigned portLONG usAddress; // ATMega2560 have 22bit Program Counter register
+        /* ATmega2560 DuinOS port by SkyWodd 
+        * Corrected by NiesteSzeck*/
+        unsigned portLONG usAddress; // ATMega2560 have 17bit Program Counter register
 #else
         unsigned portSHORT usAddress; // over ATmega have 16bit Program Counter register
 #endif
@@ -292,6 +390,18 @@ portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE
 	*pxTopOfStack = portFLAGS_INT_ENABLED;
 	pxTopOfStack--;
 
+#if defined(__AVR_ATmega2560__)
+
+	/* The Atmega2560 has two more register that we are saving
+	* The EIND and AMPZ and wea re going to initialize 
+	* this registers to 0 (default initial values)
+	*/
+	*pxTopOfStack = ( portSTACK_TYPE ) 0x00;	/* EIND */
+	pxTopOfStack--;
+	*pxTopOfStack = ( portSTACK_TYPE ) 0x00;	/* RAMPZ */
+	pxTopOfStack--;
+
+#endif
 
 	/* Now the remaining registers.   The compiler expects R1 to be 0. */
 	*pxTopOfStack = ( portSTACK_TYPE ) 0x00;	/* R1 */
