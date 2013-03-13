@@ -1,9 +1,9 @@
-#include <Arduino.h>
 #include <FreeRTOSConfig.h>
+#include <Arduino.h>
 
-unsigned portBASE_TYPE mainSetupPriority  = HIGH_PRIORITY;
-unsigned portBASE_TYPE mainSetupStackSize = configMINIMAL_STACK_SIZE * 2;
-unsigned portBASE_TYPE mainLoopPriority   = LOW_PRIORITY;
+unsigned portBASE_TYPE mainSetupPriority  = configSETUP_PRIORITY;
+unsigned portBASE_TYPE mainSetupStackSize = configMINIMAL_STACK_SIZE * 5;
+unsigned portBASE_TYPE mainLoopPriority   = configLOOP_PRIORITY;
 unsigned portBASE_TYPE mainLoopStackSize  = configMINIMAL_STACK_SIZE;
 
 xTaskHandle xHandleLoop;
