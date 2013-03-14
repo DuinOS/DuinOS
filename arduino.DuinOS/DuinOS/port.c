@@ -131,7 +131,6 @@ extern volatile tskTCB * volatile pxCurrentTCB;
 					"in		r0, __SREG__			\n\t"	\
 					"cli							\n\t"	\
 					"push	r0						\n\t"	\
-					"push	r0						\n\t"	\
 					"in		r0, 0x3b				\n\t"	\
 					"push	r0						\n\t"	\
 					"in		r0, 0x3c				\n\t"	\
@@ -313,10 +312,6 @@ extern volatile tskTCB * volatile pxCurrentTCB;
 					"pop	r2						\n\t"	\
 					"pop	r1						\n\t"	\
 					"pop	r0						\n\t"	\
-					"out	0x3c, r0				\n\t"	\
-					"pop	r0						\n\t"	\
-					"out	0x3b, r0				\n\t"	\
-					"pop	r0						\n\t"	\
 					"out	__SREG__, r0			\n\t"	\
 					"pop	r0						\n\t"	\
 				);
@@ -399,7 +394,7 @@ portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE
 #if defined(__AVR_ATmega2560__)
 
 	/* The Atmega2560 has two more register that we are saving
-	* The EIND and AMPZ and wea re going to initialize 
+	* The EIND and RAMPZ and we are going to initialize
 	* this registers to 0 (default initial values)
 	*/
 	*pxTopOfStack = ( portSTACK_TYPE ) 0x00;	/* EIND */
