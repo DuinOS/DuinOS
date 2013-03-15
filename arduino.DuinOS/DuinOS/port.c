@@ -134,6 +134,7 @@ extern volatile tskTCB * volatile pxCurrentTCB;
 					"in		r0, 0x3b				\n\t"	\
 					"push	r0						\n\t"	\
 					"in		r0, 0x3c				\n\t"	\
+					"push	r0						\n\t"	\
 					"push	r1						\n\t"	\
 					"clr	r1						\n\t"	\
 					"push	r2						\n\t"	\
