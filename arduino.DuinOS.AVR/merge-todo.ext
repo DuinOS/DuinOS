@@ -7,3 +7,4 @@ Ao fazer o Merge dos Branchs e Tags verificar sempre os itens abaixo:
 
 O Arquivo portable.h deve ser verificado já que tirei deste as verificaçòes a chamadas para multiplataforma
 
+Sempre ler o arquivo: http://www.freertos.org/History.txt
