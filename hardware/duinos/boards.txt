@@ -19,6 +19,7 @@ uno_DuinOS.bootloader.file=optiboot/optiboot_atmega328.hex
 
 uno_DuinOS.build.mcu=atmega328p
 uno_DuinOS.build.f_cpu=16000000L
+uno_DuinOS.build.board=ARDUINO_UNO
 uno_DuinOS.build.core=arduino.DuinOS.AVR
 uno_DuinOS.build.variant=standard
 
@@ -40,6 +41,7 @@ mega2560_DuinOS.bootloader.lock_bits=0x0F
 
 mega2560_DuinOS.build.mcu=atmega2560
 mega2560_DuinOS.build.f_cpu=16000000L
+mega2560_DuinOS.build.board=ARDUINO_MEGA2560
 mega2560_DuinOS.build.core=arduino.DuinOS.AVR
 mega2560_DuinOS.build.variant=mega
 
@@ -61,6 +63,7 @@ mega_DuinOS.bootloader.lock_bits=0x0F
 
 mega_DuinOS.build.mcu=atmega1280
 mega_DuinOS.build.f_cpu=16000000L
+mega_DuinOS.build.board=ARDUINO_MEGA
 mega_DuinOS.build.core=arduino.DuinOS.AVR
 mega_DuinOS.build.variant=mega
 
