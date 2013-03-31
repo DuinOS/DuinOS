@@ -125,6 +125,9 @@ void analogWrite(uint8_t pin, int val)
 				OCR0 = val; // set pwm duty
 				break;
 			#endif
+#ifdef DISABLED_BY_DUINOS
+
+// disabled because DuinOS uses timer 0 for its kernel
 
 			#if defined(TCCR0A) && defined(COM0A1)
 			case TIMER0A:
@@ -141,7 +144,7 @@ void analogWrite(uint8_t pin, int val)
 				OCR0B = val; // set pwm duty
 				break;
 			#endif
-
+#endif
 			#if defined(TCCR1A) && defined(COM1A1)
 			case TIMER1A:
 				// connect pwm to pin on timer 1, channel A
