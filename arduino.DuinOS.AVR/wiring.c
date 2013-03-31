@@ -41,13 +41,6 @@ volatile unsigned long timer0_overflow_count = 0;
 volatile unsigned long timer0_millis = 0;
 static unsigned char timer0_fract = 0;
 
-/*
-#if defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
-SIGNAL(TIM0_OVF_vect)
-#else
-SIGNAL(TIMER0_OVF_vect)
-#endif
-*/
 void vApplicationTickHook(void)
 {
 	// copy these to local variables so they can be stored in registers
@@ -108,21 +101,6 @@ unsigned long micros() {
 	
 	return ((m << 8) + t) * (64 / clockCyclesPerMicrosecond());
 }
-
-/*
-void delay(unsigned long ms)
-{
-	uint16_t start = (uint16_t)micros();
-
-	while (ms > 0) {
-		yield();
-		if (((uint16_t)micros() - start) >= 1000) {
-			ms--;
-			start += 1000;
-		}
-	}
-}
-*/
 
 /* Delay for the given number of microseconds.  Assumes a 8 or 16 MHz clock. */
 void delayMicroseconds(unsigned int us)
