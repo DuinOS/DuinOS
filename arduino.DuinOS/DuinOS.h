@@ -34,21 +34,22 @@ extern unsigned portBASE_TYPE mainLoopStackSize;
 #define NORMAL_PRIORITY		(tskIDLE_PRIORITY + 1)
 #define HIGH_PRIORITY		(tskIDLE_PRIORITY + 2)
 
-#define taskLoop(name)\
-void name##Function();\
-xTaskHandle name;\
+#define taskLoop(name) \
+static inline void name##Function() __attribute__((__section__(".text.lowtext"),__naked__,__always_inline__)); \
+void name##_Task(void *) __attribute__((__section__(".text.lowtext"))); \
+xTaskHandle name; \
 void name##_Task(void *pvParameters)\
 {\
 	for(;;)\
 		name##Function();\
 }\
-void name##Function()
+static inline void name##Function()
 
 //This macro enables the forward declaration of a task, to allow other tasks previous defined (with the
 //taskLoop()macro use and reference them:
 #define declareTaskLoop(name)\
 	extern xTaskHandle name;\
-    void name##_Task(void*)
+    void name##_Task(void *) __attribute__((__section__(".text.lowtext")))
 
 
 #define createTaskLoop(name, priority)\
