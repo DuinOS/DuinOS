@@ -125,7 +125,7 @@ extern volatile tskTCB * volatile pxCurrentTCB;
  * The interrupts will have been disabled during the call to portSAVE_CONTEXT()
  * so we need not worry about reading/writing to the stack pointer. 
  */
-inline void portSAVE_CONTEXT() __attribute__((__always_inline__,__noreturn__));
+inline void portSAVE_CONTEXT() __attribute__((__always_inline__));
 inline void portSAVE_CONTEXT(){
 	asm volatile (	"push	r0						\n\t"
 					"in		r0, __SREG__			\n\t"
@@ -190,7 +190,7 @@ inline void portSAVE_CONTEXT(){
  * Opposite to portSAVE_CONTEXT().  Interrupts will have been disabled during
  * the context save so we can write to the stack pointer. 
  */
-inline void portRESTORE_CONTEXT() __attribute__((__always_inline__,__noreturn__));
+inline void portRESTORE_CONTEXT() __attribute__((__always_inline__));
 inline void portRESTORE_CONTEXT(){
 	asm volatile (	"lds	r26, pxCurrentTCB		\n\t"
 					"lds	r27, pxCurrentTCB + 1	\n\t"
