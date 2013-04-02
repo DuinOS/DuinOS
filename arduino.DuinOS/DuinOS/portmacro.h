@@ -139,8 +139,8 @@ extern void vPortYield( void ) __attribute__ ( ( naked ) );
 /*-----------------------------------------------------------*/
 
 /* Task function macros as described on the FreeRTOS.org WEB site. */
-#define portTASK_FUNCTION_PROTO( vFunction, pvParameters ) void vFunction( void *pvParameters )
-#define portTASK_FUNCTION( vFunction, pvParameters ) void vFunction( void *pvParameters )
+#define portTASK_FUNCTION_PROTO( vFunction, pvParameters )  __attribute__((__section__(".lowtext"))) void vFunction( void *pvParameters )
+#define portTASK_FUNCTION( vFunction, pvParameters )  __attribute__((__section__(".lowtext"))) void vFunction( void *pvParameters )
 
 #ifdef __cplusplus
 }
