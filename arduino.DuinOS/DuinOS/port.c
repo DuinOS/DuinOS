@@ -262,16 +262,11 @@ static void prvSetupTimerInterrupt( void );
  */
 portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE pxCode, void *pvParameters )
 {
-/* CDCP
- * __AVR_3_BYTE_PC__ is not official, and only exist after version 4.1 of GCC
- */
-#if defined(__AVR_HAVE_RAMPZ__) || defined(__AVR_3_BYTE_PC__)
-        unsigned portLONG usAddress; // ATMega2560 have 17bit Program Counter register
-        							 // Other future uControler can have up 22, or 24 bits.
-#else
-        unsigned portSHORT usAddress; // over ATmega have 16bit Program Counter register
-#endif
-
+	/* ATmega2560 DuinOS port by SkyWodd
+	* Corrected by NiesteSzeck
+	* Edited defines evaluation as proposed by CDCP
+	* */
+	unsigned portSHORT usAddress; // over ATmega have 16bit Program Counter register
 
 	/* Place a few bytes of known values on the bottom of the stack. 
 	This is just useful for debugging. */
@@ -288,26 +283,6 @@ portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE
 
 	/*lint -e950 -e611 -e923 Lint doesn't like this much - but nothing I can do about it. */
 
-/* CDCP
- * __AVR_3_BYTE_PC__ is not official
- */
-#if defined(__AVR_HAVE_RAMPZ__) || defined(__AVR_3_BYTE_PC__)
-    // Implement normal stack initialisation but with portLONG instead of portSHORT
-        usAddress = ( unsigned portLONG ) pxCode;
-        *pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portLONG ) 0x000000ff );
-        pxTopOfStack--;
-
-        usAddress >>= 8;
-        *pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portLONG ) 0x000000ff );
-        pxTopOfStack--;
-
-        // Implemented the 3byte addressing
-        usAddress >>= 8;
-        *pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portLONG ) 0x000000ff );
-        pxTopOfStack--;
-
-// Normal initialisation for over ATmega
-#else
 	/* The start of the task code will be popped off the stack last, so place
 	it on first. */
 	usAddress = ( unsigned portSHORT ) pxCode;
@@ -316,6 +291,19 @@ portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE
 
 	usAddress >>= 8;
 	*pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portSHORT ) 0x00ff );
+	pxTopOfStack--;
+#if defined(__AVR_HAVE_RAMPZ__) || defined(__AVR_3_BYTE_PC__)
+	/*
+	   ***** __AVR_3_BYTE_PC__ is not official, and only exist after version 4.1 of GCC
+	   Implemented the 3byte addressing, it will be 0 'cause avr gcc dosn't return a 3 byte PC
+	   It only return as 2 byte PC. 'cause of this problem with gcc we should put all the task functions
+	   declarations in the above 64K word memory (128KBi)
+	   Based work at
+	   http://www.avrfreaks.net/index.php?name=PNphpBB2&file=viewtopic&t=70387
+	   http://feilipu.posterous.com/ethermega-arduino-mega-2560-and-freertos
+	   Refer to SiezeofPC example to check the size of the function pointer
+	*/
+	*pxTopOfStack = ( portSTACK_TYPE ) ( 0x0000 );
 	pxTopOfStack--;
 #endif
 
@@ -328,14 +316,14 @@ portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE
 	*pxTopOfStack = portFLAGS_INT_ENABLED;
 	pxTopOfStack--;
 
-	/* CDCP - begin*/
 #if defined(__AVR_HAVE_RAMPZ__)
-	/*
+	/* CDCP:
 	 * have RAMPZ Extended Z-pointer Register for ELPM/SPM
 	 * the uC have extend program memory
 	 */
 
-	/* The Atmega2560 has two more register that we are saving
+	/* Niesteszeck:
+	* The Atmega2560 has two more register that we are saving
 	* The EIND and RAMPZ and we are going to initialize
 	* this registers to 0 (default initial values)
 	*/
