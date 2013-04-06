@@ -262,16 +262,14 @@ static void prvSetupTimerInterrupt( void );
  */
 portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE pxCode, void *pvParameters )
 {
-/* CDCP
- * __AVR_3_BYTE_PC__ is not official, and only exist after version 4.1 of GCC
- */
-#if defined(__AVR_HAVE_RAMPZ__) || defined(__AVR_3_BYTE_PC__)
-        unsigned portLONG usAddress; // ATMega2560 have 17bit Program Counter register
-        							 // Other future uControler can have up 22, or 24 bits.
-#else
-        unsigned portSHORT usAddress; // over ATmega have 16bit Program Counter register
-#endif
-
+	/*
+	 * ATMega2560 have 17bit Program Counter register
+	 * Other future uControler can have up 22, or 24 bits.
+	 * Other ATmega have 16bit Program Counter register.
+	 * but, GCC use a trampoline section over 64K to get
+	 * Function Point with 2 bytes.
+	 */
+	unsigned portSHORT usAddress; // over ATmega have 16bit Program Counter register
 
 	/* Place a few bytes of known values on the bottom of the stack. 
 	This is just useful for debugging. */
@@ -288,26 +286,6 @@ portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE
 
 	/*lint -e950 -e611 -e923 Lint doesn't like this much - but nothing I can do about it. */
 
-/* CDCP
- * __AVR_3_BYTE_PC__ is not official
- */
-#if defined(__AVR_HAVE_RAMPZ__) || defined(__AVR_3_BYTE_PC__)
-    // Implement normal stack initialisation but with portLONG instead of portSHORT
-        usAddress = ( unsigned portLONG ) pxCode;
-        *pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portLONG ) 0x000000ff );
-        pxTopOfStack--;
-
-        usAddress >>= 8;
-        *pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portLONG ) 0x000000ff );
-        pxTopOfStack--;
-
-        // Implemented the 3byte addressing
-        usAddress >>= 8;
-        *pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portLONG ) 0x000000ff );
-        pxTopOfStack--;
-
-// Normal initialisation for over ATmega
-#else
 	/* The start of the task code will be popped off the stack last, so place
 	it on first. */
 	usAddress = ( unsigned portSHORT ) pxCode;
@@ -317,7 +295,6 @@ portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE
 	usAddress >>= 8;
 	*pxTopOfStack = ( portSTACK_TYPE ) ( usAddress & ( unsigned portSHORT ) 0x00ff );
 	pxTopOfStack--;
-#endif
 
 	/* Next simulate the stack as if after a call to portSAVE_CONTEXT().  
 	portSAVE_CONTEXT places the flags on the stack immediately after r0
@@ -328,17 +305,13 @@ portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE
 	*pxTopOfStack = portFLAGS_INT_ENABLED;
 	pxTopOfStack--;
 
-	/* CDCP - begin*/
-#if defined(__AVR_HAVE_RAMPZ__)
-	/*
-	 * have RAMPZ Extended Z-pointer Register for ELPM/SPM
-	 * the uC have extend program memory
-	 */
 
-	/* The Atmega2560 has two more register that we are saving
-	* The EIND and RAMPZ and we are going to initialize
-	* this registers to 0 (default initial values)
-	*/
+#if defined(__AVR_HAVE_RAMPZ__)
+	/* CDCP:
+	 * The Atmega2560 has two more register that we are saving
+	 * The EIND and RAMPZ and we are going to initialize
+	 * this registers to 0 (default initial values)
+	 */
 	*pxTopOfStack = ( portSTACK_TYPE ) 0x00;	/* EIND */
 	pxTopOfStack--;
 	*pxTopOfStack = ( portSTACK_TYPE ) 0x00;	/* RAMPZ */

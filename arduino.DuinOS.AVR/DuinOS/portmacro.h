@@ -102,8 +102,14 @@ extern "C" {
 #define portDOUBLE		double
 #define portLONG		long
 #define portSHORT		int
-#define portSTACK_TYPE	unsigned portCHAR
+#define portSTACK_TYPE	unsigned int /* CDCP: stack size on avr8 is 1024 (0x0400) max, two bytes. */
 #define portBASE_TYPE	char
+
+/* CDCP:
+ * ATmega256x/ATmega128x even the pointer is two bytes,
+ * since GCC uses the "trampoline" to adjust the addresses above 64K.
+ */
+#define portPOINTER_SIZE_TYPE unsigned int
 
 #if( configUSE_16_BIT_TICKS == 1 )
 	typedef unsigned portSHORT portTickType;
