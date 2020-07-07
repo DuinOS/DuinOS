@@ -42,7 +42,7 @@ int main(void)
 	USBDevice.attach();
 #endif
 
-	xTaskCreate(setup_Task, (signed portCHAR *) "setup", mainSetupStackSize, NULL, mainSetupStackSize, &xHandleSetup);
+	xTaskCreate(setup_Task, (signed portCHAR *) "setup", mainSetupStackSize, NULL, mainSetupPriority, &xHandleSetup);
 
 	vTaskStartScheduler();
 
