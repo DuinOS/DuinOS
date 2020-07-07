@@ -27,7 +27,7 @@
 	#define configSETUP_STACK_SIZE          (configMINIMAL_STACK_SIZE * 2)
 	#define configLOOP_STACK_SIZE           (configMINIMAL_STACK_SIZE)
 	#define configSETUP_PRIORITY			HIGH_PRIORITY
-	#define configSETUP_PRIORITY			LOW_PRIORITY
+	#define configLOOP_PRIORITY			LOW_PRIORITY
 
 	/* Set the following definitions to 1 to include the API function, or zero
 	to exclude the API function. */
