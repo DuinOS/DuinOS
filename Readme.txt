@@ -6,7 +6,7 @@ Copyright (C) 2020 Curso Arduino Minas
 http://duinos.github.io
 http://arduinominas.github.io
 http://carlosdelfino.eti.br
-Maintained by Carlos Delfino Carvalho Pinheiro.
+Maintained by Carlos Delfino Carvalho Pinheiro and many others volunteers.
 
 ********************************
  DuinOS v0.4 Alpha
