@@ -1,4 +1,14 @@
 ********************************
+ DuinOS New Approach
+********************************
+
+Copyright (C) 2020 Curso Arduino Minas
+http://duinos.github.io
+http://arduinominas.github.io
+http://carlosdelfino.eti.br
+Maintained by Carlos Delfino Carvalho Pinheiro.
+
+********************************
  DuinOS v0.4 Alpha
 ********************************
 
